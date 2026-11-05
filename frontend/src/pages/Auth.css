@@ -1,0 +1,37 @@
+.auth-page {
+  min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 20px; background: var(--bg-primary); position: relative; overflow: hidden;
+}
+.auth-bg { position: fixed; inset: 0; pointer-events: none; }
+.auth-orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.12; }
+.auth-orb.orb-1 { width: 400px; height: 400px; background: var(--brand-primary); top: -100px; right: -100px; }
+.auth-orb.orb-2 { width: 350px; height: 350px; background: var(--brand-secondary); bottom: -100px; left: -100px; }
+.auth-logo {
+  display: flex; align-items: center; gap: 10px; text-decoration: none; margin-bottom: 32px; position: relative; z-index: 1;
+}
+.auth-card {
+  background: var(--bg-card); border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl); padding: 40px; width: 100%; max-width: 420px;
+  box-shadow: var(--shadow-lg); position: relative; z-index: 1;
+}
+.auth-header { margin-bottom: 28px; }
+.auth-title { font-size: 1.6rem; font-weight: 800; margin-bottom: 8px; }
+.auth-subtitle { color: var(--text-muted); font-size: 0.9rem; }
+.auth-form { display: flex; flex-direction: column; gap: 18px; margin-bottom: 20px; }
+.input-with-icon { position: relative; }
+.input-with-icon .form-input { padding-right: 44px; }
+.input-icon-btn {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; color: var(--text-muted); cursor: pointer;
+  display: flex; align-items: center; transition: color var(--transition-fast);
+}
+.input-icon-btn:hover { color: var(--text-primary); }
+.auth-footer-text { text-align: center; font-size: 0.88rem; color: var(--text-muted); margin-top: 20px; }
+.auth-link { color: var(--brand-primary); font-weight: 600; }
+.auth-terms { text-align: center; font-size: 0.78rem; color: var(--text-muted); margin-top: 12px; line-height: 1.5; }
+.auth-terms a { color: var(--brand-primary); }
+.divider-text {
+  display: flex; align-items: center; gap: 12px; color: var(--text-muted); font-size: 0.83rem;
+  margin: 16px 0;
+}
+.divider-text::before, .divider-text::after { content: ''; flex: 1; height: 1px; background: var(--border-subtle); }

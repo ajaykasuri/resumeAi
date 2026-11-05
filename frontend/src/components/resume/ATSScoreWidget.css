@@ -1,0 +1,33 @@
+.ats-widget { display: flex; flex-direction: column; gap: 14px; padding: 16px; }
+
+.ats-header { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-secondary); }
+
+.ats-score-display { display: flex; align-items: center; gap: 16px; }
+.score-ring-svg { flex-shrink: 0; }
+.ats-score-label { font-family: var(--font-display); font-size: 1.1rem; font-weight: 800; }
+.ats-score-sub { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+
+.ats-breakdown { display: flex; flex-direction: column; gap: 8px; }
+.ats-bar-row { display: flex; align-items: center; gap: 8px; }
+.ats-bar-label { font-size: 0.75rem; color: var(--text-muted); width: 80px; flex-shrink: 0; text-transform: capitalize; }
+.ats-bar-track { flex: 1; height: 4px; background: var(--bg-card-hover); border-radius: 2px; overflow: hidden; }
+.ats-bar-fill { height: 100%; border-radius: 2px; }
+.ats-bar-val { font-size: 0.72rem; color: var(--text-muted); width: 28px; text-align: right; flex-shrink: 0; }
+
+.ats-checklist { display: flex; flex-direction: column; gap: 7px; }
+.ats-check-item { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; }
+.ats-check-item.ok { color: var(--success); }
+.ats-check-item.warn { color: var(--text-muted); }
+.ats-check-item.warn svg { color: var(--warning); }
+
+.ats-suggestions { background: var(--bg-secondary); border-radius: var(--radius-md); padding: 12px; }
+.ats-suggestions-label { font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px; }
+.ats-suggestion-item { font-size: 0.78rem; color: var(--text-muted); padding: 4px 0; border-top: 1px solid var(--border-subtle); line-height: 1.4; }
+.ats-suggestion-item:first-of-type { border-top: none; }
+
+.ats-missing { }
+.ats-missing-label { font-size: 0.75rem; font-weight: 700; color: var(--warning); margin-bottom: 8px; }
+.ats-missing-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+.ats-missing-tag { padding: 2px 8px; border-radius: var(--radius-full); background: rgba(255,179,71,0.1); border: 1px solid rgba(255,179,71,0.2); color: var(--warning); font-size: 0.72rem; }
+
+.ats-analyze-btn { margin-top: 4px; }

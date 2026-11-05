@@ -1,0 +1,48 @@
+.se-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.se-full { grid-column: 1 / -1; }
+.se-items { display: flex; flex-direction: column; gap: 10px; }
+.se-label-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.se-ai-btn { font-size: 0.78rem !important; padding: 5px 10px !important; color: var(--brand-primary) !important; border: 1px solid rgba(108,99,255,0.3) !important; }
+.se-ai-btn:hover { background: rgba(108,99,255,0.08) !important; }
+
+.se-collapsible { overflow: hidden; }
+.se-collapsible-header {
+  display: flex; align-items: center; gap: 10px; padding: 12px 14px;
+  cursor: pointer; background: var(--bg-secondary); transition: background var(--transition-fast);
+}
+.se-collapsible-header:hover { background: var(--bg-card-hover); }
+.se-grip { color: var(--text-muted); flex-shrink: 0; }
+.se-item-label { flex: 1; font-size: 0.87rem; font-weight: 600; color: var(--text-primary); }
+.se-header-actions { display: flex; gap: 4px; }
+.se-collapsible-body { padding: 16px 14px; display: flex; flex-direction: column; gap: 14px; border-top: 1px solid var(--border-subtle); }
+
+.se-bullet-row { display: flex; align-items: flex-start; gap: 8px; }
+.se-bullet-dot { color: var(--text-muted); padding-top: 12px; flex-shrink: 0; font-size: 0.9rem; }
+.se-bullet-row .form-input, .se-bullet-row .form-textarea { flex: 1; }
+.se-rm-btn { color: var(--text-muted) !important; flex-shrink: 0; }
+.se-rm-btn:hover { color: var(--error) !important; background: rgba(255,77,109,0.08) !important; }
+.se-add-sub { color: var(--text-muted) !important; font-size: 0.8rem !important; margin-top: 6px; }
+.se-add-item { width: 100%; border: 1px dashed var(--border-default) !important; justify-content: center; }
+.se-add-item:hover { border-color: var(--brand-primary) !important; color: var(--brand-primary) !important; }
+
+.se-skill-cat-block { padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.se-skill-cat-header { display: flex; align-items: center; gap: 8px; }
+.se-cat-input { font-weight: 600 !important; }
+.se-skill-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.se-skill-tag {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(108,99,255,0.1); border: 1px solid rgba(108,99,255,0.25);
+  color: var(--brand-primary); padding: 4px 10px; border-radius: var(--radius-full);
+  font-size: 0.8rem; font-weight: 500;
+}
+.se-skill-tag button {
+  background: none; border: none; cursor: pointer; color: var(--brand-primary);
+  font-size: 1rem; line-height: 1; opacity: 0.6; padding: 0;
+}
+.se-skill-tag button:hover { opacity: 1; }
+.se-skill-input-row { display: flex; gap: 8px; }
+.se-skill-input-row .form-input { flex: 1; }
+.se-add-cat { font-size: 0.8rem !important; color: var(--text-muted) !important; }
+
+.se-lang-row { position: relative; align-items: end; }
+.se-lang-rm { position: absolute; right: 0; top: 0; }

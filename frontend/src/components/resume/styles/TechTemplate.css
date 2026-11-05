@@ -1,0 +1,205 @@
+/* ─────────────────────────────────────────────────────────────
+   TECH TEMPLATE CSS - Code-like aesthetic
+───────────────────────────────────────────────────────────── */
+
+.tech-template-root {
+  width: 100%;
+  max-width: 8.5in;
+  height: 11in;
+  margin: 0 auto;
+  padding: 0;
+  background: #0f172a;
+  color: #e2e8f0;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+.techT-header {
+  padding: 0.25in 0.35in;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  margin-bottom: 0.15in;
+}
+
+.techT-name-block {
+  margin-bottom: 0.1in;
+}
+
+.techT-name {
+  margin: 0;
+  font-size: 1.1em;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.techT-job-title {
+  font-size: 0.85em;
+  margin-top: 0.04in;
+  font-weight: 500;
+}
+
+.techT-contact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.04in;
+  font-size: 0.75em;
+  margin-top: 0.08in;
+}
+
+.techT-contact-item {
+  display: flex;
+  align-items: center;
+  gap: 0.05in;
+}
+
+.techT-section {
+  padding: 0.15in 0.35in;
+  margin-bottom: 0.12in;
+  page-break-inside: avoid;
+}
+
+.techT-section-title {
+  margin: 0 0 0.1in 0;
+  font-size: 0.8em;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.techT-exp-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1in;
+}
+
+.techT-exp-item {
+  margin-bottom: 0.08in;
+  page-break-inside: avoid;
+}
+
+.techT-exp-header {
+  display: flex;
+  gap: 0.05in;
+  align-items: baseline;
+  font-size: 0.82em;
+  margin-bottom: 0.02in;
+}
+
+.techT-job {
+  font-weight: 600;
+}
+
+.techT-company {
+  font-size: 0.75em;
+  opacity: 0.7;
+}
+
+.techT-exp-date {
+  font-size: 0.75em;
+  opacity: 0.7;
+  margin-bottom: 0.04in;
+}
+
+.techT-bullets {
+  margin: 0.04in 0 0 0;
+  padding-left: 0.1in;
+  font-size: 0.78em;
+  line-height: 1.3;
+}
+
+.techT-bullets li {
+  margin-bottom: 0.03in;
+  margin-left: 0.1in;
+  list-style: none;
+}
+
+.techT-edu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.08in;
+}
+
+.techT-edu-item {
+  font-size: 0.8em;
+  page-break-inside: avoid;
+}
+
+.techT-degree {
+  font-weight: 600;
+  margin-bottom: 0.02in;
+}
+
+.techT-school {
+  opacity: 0.8;
+  font-size: 0.9em;
+}
+
+.techT-edu-date {
+  font-size: 0.75em;
+  opacity: 0.7;
+}
+
+.techT-skills {
+  display: flex;
+  flex-direction: column;
+  gap: 0.08in;
+}
+
+.techT-skill-cat {
+  page-break-inside: avoid;
+}
+
+.techT-skill-cat-name {
+  font-size: 0.75em;
+  font-weight: 600;
+  margin-bottom: 0.05in;
+  letter-spacing: 0.5px;
+}
+
+.techT-skill-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.04in;
+}
+
+.techT-skill-tag {
+  border: 1px solid;
+  border-radius: 4px;
+  padding: 0.02in 0.06in;
+  font-size: 0.7em;
+  display: inline-block;
+}
+
+.techT-proj-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1in;
+}
+
+.techT-proj-item {
+  page-break-inside: avoid;
+  margin-bottom: 0.06in;
+}
+
+.techT-proj-name {
+  font-size: 0.85em;
+  font-weight: 600;
+  margin-bottom: 0.03in;
+}
+
+.techT-proj-desc {
+  margin: 0.03in 0;
+  font-size: 0.78em;
+  line-height: 1.3;
+  opacity: 0.9;
+}
+
+.techT-tech-tags {
+  font-size: 0.7em;
+  margin-top: 0.03in;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.04in;
+}
+
+.techT-tech-tags span {
+  opacity: 0.8;
+}

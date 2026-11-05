@@ -1,0 +1,103 @@
+.navbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: var(--z-sticky);
+  padding: 0 24px; transition: all var(--transition-base);
+  background: transparent;
+}
+.navbar-scrolled {
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid var(--border-subtle);
+  box-shadow: 0 4px 24px rgba(23,32,51,0.08);
+}
+.navbar-container {
+  max-width: 1200px; margin: 0 auto;
+  display: flex; align-items: center; gap: 32px;
+  height: 68px;
+}
+.navbar-logo {
+  display: flex; align-items: center; gap: 10px;
+  text-decoration: none; color: inherit; flex-shrink: 0;
+}
+.logo-icon {
+  width: 34px; height: 34px; border-radius: 8px;
+  background: var(--brand-gradient);
+  display: flex; align-items: center; justify-content: center;
+  color: white; box-shadow: var(--shadow-brand);
+}
+.logo-text {
+  font-family: var(--font-display); font-size: 1.2rem; font-weight: 800;
+  color: var(--text-primary); letter-spacing: -0.02em;
+}
+.logo-accent { color: var(--brand-primary); }
+
+.navbar-links {
+  display: flex; align-items: center; gap: 4px; flex: 1;
+}
+.nav-link {
+  padding: 6px 14px; border-radius: var(--radius-sm);
+  font-size: 0.88rem; font-weight: 500; color: var(--text-secondary);
+  text-decoration: none; transition: all var(--transition-fast);
+}
+.nav-link:hover, .nav-link.active { color: var(--text-primary); background: var(--bg-card); }
+
+.navbar-actions { display: flex; align-items: center; gap: 10px; }
+
+.profile-menu { position: relative; }
+.profile-btn {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--bg-card); border: 1px solid var(--border-default);
+  border-radius: var(--radius-full); padding: 5px 12px 5px 5px;
+  cursor: pointer; color: var(--text-primary); transition: all var(--transition-fast);
+}
+.profile-btn:hover { border-color: var(--brand-primary); }
+.profile-btn .rotated { transform: rotate(180deg); transition: transform var(--transition-fast); }
+
+.avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--brand-gradient); display: flex; align-items: center; justify-content: center;
+  font-size: 0.82rem; font-weight: 700; color: white;
+}
+.profile-name { font-size: 0.85rem; font-weight: 600; }
+
+.profile-dropdown {
+  position: absolute; top: calc(100% + 8px); right: 0;
+  background: var(--bg-card); border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg); padding: 8px; min-width: 200px;
+  box-shadow: var(--shadow-lg); z-index: var(--z-dropdown);
+}
+.dropdown-header { padding: 8px 10px 12px; }
+.dropdown-name { display: block; font-weight: 600; font-size: 0.9rem; color: var(--text-primary); }
+.dropdown-email { display: block; font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+.dropdown-divider { height: 1px; background: var(--border-subtle); margin: 4px 0; }
+.dropdown-item {
+  display: flex; align-items: center; gap: 10px; padding: 9px 10px;
+  border-radius: var(--radius-sm); font-size: 0.87rem; color: var(--text-secondary);
+  text-decoration: none; cursor: pointer; background: none; border: none;
+  width: 100%; transition: all var(--transition-fast);
+}
+.dropdown-item:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+.dropdown-item.danger:hover { color: var(--error); background: rgba(255,77,109,0.08); }
+
+.mobile-toggle {
+  display: none; background: none; border: none; color: var(--text-primary);
+  cursor: pointer; padding: 6px; border-radius: var(--radius-sm);
+  margin-left: auto;
+}
+.mobile-menu {
+  background: var(--bg-card); border-top: 1px solid var(--border-subtle);
+  overflow: hidden;
+}
+.mobile-link {
+  display: block; padding: 14px 24px; font-size: 0.95rem; color: var(--text-secondary);
+  text-decoration: none; border: none; background: none; width: 100%; text-align: left; cursor: pointer;
+  transition: color var(--transition-fast);
+}
+.mobile-link:hover { color: var(--text-primary); background: var(--bg-card-hover); }
+.mobile-link.danger:hover { color: var(--error); }
+.mobile-divider { height: 1px; background: var(--border-subtle); margin: 8px 0; }
+.overlay { position: fixed; inset: 0; z-index: 90; }
+
+@media (max-width: 768px) {
+  .navbar-links, .navbar-actions { display: none; }
+  .mobile-toggle { display: flex; }
+}

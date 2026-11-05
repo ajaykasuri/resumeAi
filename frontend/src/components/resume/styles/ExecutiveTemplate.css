@@ -1,0 +1,236 @@
+/* ─────────────────────────────────────────────────────────────
+   EXECUTIVE TEMPLATE CSS - High-end multi-column layout
+───────────────────────────────────────────────────────────── */
+
+.executive-template-root {
+  width: 100%;
+  max-width: 8.5in;
+  height: 11in;
+  margin: 0 auto;
+  padding: 0;
+  background: white;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.exT-header {
+  color: white;
+  padding: 0.35in;
+}
+
+.exT-name-section {
+  margin-bottom: 0.1in;
+}
+
+.exT-name {
+  margin: 0;
+  font-size: 1.25em;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.exT-job-title {
+  font-size: 0.9em;
+  margin-top: 0.05in;
+  font-weight: 500;
+  font-style: italic;
+}
+
+.exT-contact-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.12in;
+  font-size: 0.75em;
+  margin-top: 0.1in;
+}
+
+.exT-contact-item {
+  border-bottom: 1px solid;
+  padding-bottom: 0.02in;
+  white-space: nowrap;
+  opacity: 0.95;
+}
+
+.exT-layout {
+  display: flex;
+  gap: 0.2in;
+  padding: 0.3in 0.35in;
+  height: calc(11in - 1.35in);
+  overflow-y: auto;
+}
+
+.exT-left-col {
+  width: 35%;
+  flex-shrink: 0;
+  border-right: 2px solid #e0e0e0;
+  padding-right: 0.2in;
+}
+
+.exT-right-col {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.exT-summary-section,
+.exT-skills-section {
+  margin-bottom: 0.2in;
+  page-break-inside: avoid;
+}
+
+.exT-summary-box {
+  border-radius: 4px;
+  padding: 0.1in;
+  font-size: 0.8em;
+  line-height: 1.5;
+}
+
+.exT-summary {
+  margin: 0;
+}
+
+.exT-exp-section,
+.exT-edu-section,
+.exT-proj-section {
+  margin-bottom: 0.15in;
+  page-break-inside: avoid;
+}
+
+.exT-exp-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.12in;
+}
+
+.exT-exp-item {
+  page-break-inside: avoid;
+  margin-bottom: 0.04in;
+}
+
+.exT-exp-title {
+  font-weight: 700;
+  font-size: 0.9em;
+  margin-bottom: 0.02in;
+}
+
+.exT-company {
+  font-size: 0.8em;
+  opacity: 0.8;
+  margin-bottom: 0.03in;
+}
+
+.exT-exp-date {
+  font-size: 0.75em;
+  opacity: 0.7;
+  margin-bottom: 0.04in;
+}
+
+.exT-bullets {
+  margin: 0.04in 0 0 0;
+  padding-left: 0.12in;
+  font-size: 0.78em;
+  line-height: 1.4;
+}
+
+.exT-bullets li {
+  margin-bottom: 0.03in;
+  margin-left: 0.1in;
+}
+
+.exT-edu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1in;
+}
+
+.exT-edu-item {
+  page-break-inside: avoid;
+}
+
+.exT-degree {
+  font-weight: 600;
+  font-size: 0.85em;
+  margin-bottom: 0.01in;
+}
+
+.exT-school {
+  font-size: 0.8em;
+  opacity: 0.8;
+  margin-bottom: 0.02in;
+}
+
+.exT-edu-date {
+  font-size: 0.75em;
+  opacity: 0.7;
+}
+
+.exT-skills-matrix {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.12in;
+  font-size: 0.75em;
+}
+
+.exT-skill-col {
+  page-break-inside: avoid;
+}
+
+.exT-skill-cat-name {
+  font-weight: 700;
+  font-size: 0.8em;
+  margin-bottom: 0.05in;
+  padding-bottom: 0.03in;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.exT-skill-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.03in;
+}
+
+.exT-skill-item {
+  font-size: 0.75em;
+  opacity: 0.9;
+}
+
+.exT-proj-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1in;
+}
+
+.exT-proj-item {
+  page-break-inside: avoid;
+}
+
+.exT-proj-name {
+  font-weight: 600;
+  font-size: 0.85em;
+  margin-bottom: 0.02in;
+}
+
+.exT-proj-desc {
+  margin: 0.02in 0;
+  font-size: 0.75em;
+  line-height: 1.4;
+  opacity: 0.9;
+}
+
+.exT-tech-list {
+  font-size: 0.7em;
+  opacity: 0.8;
+  margin-top: 0.03in;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.05in;
+}
+
+.exT-tech-list span {
+  display: inline-block;
+}
+
+h3 {
+  font-size: 0.85em;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}

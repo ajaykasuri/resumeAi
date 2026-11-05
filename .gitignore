@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Environment
+.env
+*/.env
+**/.env
+
+# Build outputs
+frontend/build/
+backend/dist/
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Uploads
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# MySQL data (Docker)
+mysql_data/

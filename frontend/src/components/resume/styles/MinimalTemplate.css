@@ -1,0 +1,182 @@
+/* ─────────────────────────────────────────────────────────────
+   MINIMAL TEMPLATE CSS - Ultra-clean design
+───────────────────────────────────────────────────────────── */
+
+.minimal-template-root {
+  width: 100%;
+  max-width: 8.5in;
+  height: 11in;
+  margin: 0 auto;
+  padding: 0;
+  background: white;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.mt-header {
+  padding: 0.4in 0.5in 0.2in;
+  border-bottom: 1px solid #ddd;
+}
+
+.mt-name-section {
+  color: white;
+  padding: 0.25in;
+  margin: -0.4in -0.5in 0.15in -0.5in;
+  padding: 0.25in 0.5in;
+}
+
+.mt-name {
+  margin: 0;
+  font-size: 1.2em;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.mt-job-title {
+  font-size: 0.9em;
+  margin-top: 0.04in;
+  font-weight: 500;
+}
+
+.mt-divider {
+  height: 1px;
+  background: #e0e0e0;
+  margin: 0.1in 0;
+}
+
+.mt-contact-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15in;
+  font-size: 0.8em;
+  margin-top: 0.08in;
+}
+
+.mt-contact-item {
+  word-break: break-word;
+}
+
+.mt-section {
+  padding: 0.2in 0.5in;
+  margin-bottom: 0.15in;
+  page-break-inside: avoid;
+}
+
+.mt-section-title {
+  margin: 0 0 0.1in 0;
+  font-size: 0.85em;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 0.06in;
+}
+
+.mt-summary {
+  margin: 0;
+  font-size: 0.85em;
+  line-height: 1.5;
+  color: #333;
+}
+
+.mt-exp-list,
+.mt-edu-list,
+.mt-proj-list {
+  margin: 0;
+  padding: 0;
+}
+
+.mt-exp-item,
+.mt-edu-item,
+.mt-proj-item {
+  margin-bottom: 0.12in;
+  page-break-inside: avoid;
+}
+
+.mt-exp-dates,
+.mt-edu-dates {
+  font-size: 0.75em;
+  opacity: 0.7;
+  margin-bottom: 0.02in;
+}
+
+.mt-exp-title,
+.mt-degree {
+  font-weight: 600;
+  font-size: 0.88em;
+  margin-bottom: 0.02in;
+}
+
+.mt-exp-company,
+.mt-institution {
+  font-size: 0.8em;
+  opacity: 0.8;
+  margin-bottom: 0.03in;
+}
+
+.mt-gpa {
+  font-size: 0.75em;
+  opacity: 0.7;
+  margin-top: 0.02in;
+}
+
+.mt-bullets {
+  margin: 0.05in 0 0 0;
+  padding-left: 0.15in;
+  font-size: 0.8em;
+  line-height: 1.4;
+}
+
+.mt-bullets li {
+  margin-bottom: 0.03in;
+  margin-left: 0.12in;
+}
+
+.mt-skills-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.1in;
+}
+
+.mt-skill-col {
+  page-break-inside: avoid;
+}
+
+.mt-skill-cat-label {
+  font-weight: 600;
+  font-size: 0.8em;
+  margin-bottom: 0.04in;
+  opacity: 0.8;
+}
+
+.mt-skill-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.04in;
+}
+
+.mt-skill-item {
+  font-size: 0.75em;
+  display: inline-block;
+}
+
+.mt-proj-name {
+  font-weight: 600;
+  font-size: 0.88em;
+  margin-bottom: 0.03in;
+}
+
+.mt-proj-desc {
+  margin: 0.03in 0;
+  font-size: 0.8em;
+  line-height: 1.4;
+}
+
+.mt-tech-list {
+  font-size: 0.75em;
+  opacity: 0.7;
+  margin-top: 0.04in;
+}
+
+.mt-tech-tag {
+  display: inline-block;
+  margin-right: 0.1in;
+}

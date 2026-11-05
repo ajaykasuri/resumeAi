@@ -1,0 +1,19 @@
+.template-carousel-panel { width: min(440px, 42vw); min-width: 340px; display: flex; flex-direction: column; gap: 12px; padding: 16px; overflow-y: auto; background: var(--bg-card); border-left: 1px solid var(--border-default); box-shadow: var(--shadow-md); }
+.template-carousel-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.template-carousel-heading { display: flex; align-items: flex-start; gap: 10px; color: var(--brand-primary); }
+.template-carousel-heading h2 { margin: 0 0 4px; color: var(--text-primary); font-size: 1rem; }
+.template-carousel-heading p { margin: 0; color: var(--text-muted); font-size: 0.75rem; }
+.template-carousel-preview { flex: 0 0 auto; align-self: center; width: min(100%, 365px); height: min(57vh, 545px); overflow: auto; border: 1px solid var(--border-default); border-radius: var(--radius-md); background: #e9edf5; box-shadow: var(--shadow-sm); }
+.template-carousel-preview > * { transform: scale(0.36); transform-origin: top left; margin-bottom: -719px; }
+.template-carousel-details { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.template-carousel-name { color: var(--text-primary); font-size: 0.95rem; font-weight: 700; }
+.template-carousel-category { padding: 3px 9px; color: var(--brand-primary); background: rgba(91,82,232,0.08); border-radius: var(--radius-full); font-size: 0.7rem; text-transform: capitalize; }
+.template-carousel-controls { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.template-carousel-count { color: var(--text-muted); font-size: 0.78rem; font-variant-numeric: tabular-nums; }
+.template-carousel-apply { width: 100%; }
+.template-carousel-empty { padding: 24px 8px; color: var(--text-muted); font-size: 0.85rem; text-align: center; }
+
+@media (max-width: 768px) {
+  .template-carousel-panel { position: absolute; z-index: 25; inset: 0 0 0 auto; width: min(100%, 440px); min-width: 0; }
+  .template-carousel-preview { height: min(55vh, 500px); }
+}

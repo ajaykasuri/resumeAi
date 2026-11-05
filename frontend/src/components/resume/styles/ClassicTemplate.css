@@ -1,0 +1,178 @@
+/* ─────────────────────────────────────────────────────────────
+   CLASSIC TEMPLATE CSS - Traditional single-column layout
+───────────────────────────────────────────────────────────── */
+
+.classic-template-root {
+  width: 100%;
+  max-width: 8.5in;
+  height: 11in;
+  margin: 0 auto;
+  padding: 0;
+  background: white;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.ct-header {
+  color: white;
+  padding: 0.5in;
+  margin-bottom: 0.15in;
+}
+
+.ct-header-content {
+  margin-bottom: 0.15in;
+}
+
+.ct-name {
+  margin: 0;
+  font-size: 1.2em;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.ct-job-title {
+  font-size: 0.95em;
+  margin-top: 0.05in;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.ct-contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15in;
+  font-size: 0.8em;
+}
+
+.ct-contact-item {
+  display: flex;
+  align-items: center;
+  gap: 0.05in;
+}
+
+.ct-contact-icon {
+  font-weight: 600;
+}
+
+.ct-accent-bar {
+  height: 2px;
+  width: 100%;
+}
+
+.ct-body {
+  padding: 0.35in 0.5in;
+}
+
+.ct-section {
+  margin-bottom: 0.2in;
+  page-break-inside: avoid;
+}
+
+.ct-section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.1in;
+  margin-bottom: 0.1in;
+}
+
+.ct-section-title {
+  margin: 0;
+  font-size: 0.95em;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.ct-section-line {
+  flex-grow: 1;
+  height: 1px;
+}
+
+.ct-section-content {
+  margin-top: 0.08in;
+}
+
+.ct-list {
+  margin: 0;
+  padding: 0;
+}
+
+.ct-exp-item,
+.ct-edu-item {
+  margin-bottom: 0.12in;
+  page-break-inside: avoid;
+}
+
+.ct-exp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.05in;
+}
+
+.ct-item-title {
+  font-weight: 600;
+  font-size: 0.95em;
+}
+
+.ct-item-subtitle {
+  font-size: 0.9em;
+  opacity: 0.8;
+  margin-top: 0.02in;
+}
+
+.ct-dates {
+  font-size: 0.85em;
+  white-space: nowrap;
+  opacity: 0.7;
+}
+
+.ct-bullets {
+  margin: 0.05in 0 0 0;
+  padding-left: 0.15in;
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
+.ct-bullets li {
+  margin-bottom: 0.04in;
+  list-style: disc;
+  margin-left: 0.15in;
+}
+
+.ct-skills {
+  display: flex;
+  flex-direction: column;
+  gap: 0.08in;
+}
+
+.ct-skill-cat {
+  page-break-inside: avoid;
+}
+
+.ct-skill-cat-name {
+  font-weight: 600;
+  font-size: 0.85em;
+  margin-bottom: 0.05in;
+  opacity: 0.9;
+}
+
+.ct-skill-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.06in;
+}
+
+.ct-skill-tag {
+  border: 1px solid;
+  border-radius: 12px;
+  padding: 0.03in 0.08in;
+  font-size: 0.8em;
+  display: inline-block;
+}
+
+.ct-placeholder {
+  font-style: italic;
+  opacity: 0.6;
+  font-size: 0.9em;
+}
