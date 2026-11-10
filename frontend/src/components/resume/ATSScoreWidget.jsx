@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, TrendingUp, AlertCircle, CheckCircle, XCircle, Zap } from 'lucide-react';
-import { calculateATSScore } from '../../utils/helpers';
+import { AlertCircle, CheckCircle, Shield, Sparkles, Target, Zap } from 'lucide-react';
+import { calculateATSScore, calculateJobDescriptionMatch, calculateResumeCompleteness } from '../../utils/helpers';
 import { aiAPI } from '../../services/api';
 import toast from 'react-hot-toast';
 import './ATSScoreWidget.css';
@@ -31,42 +31,48 @@ function ScoreRing({ score, size = 100 }) {
   );
 }
 
-export default function ATSScoreWidget({ sections, jobDescription = '' }) {
+export default function ATSScoreWidget({ sections, jobDescription = '', onJobDescriptionChange }) {
   const [localScore, setLocalScore] = useState(0);
   const [aiAnalysis, setAiAnalysis] = useState(null);
   const [loading, setLoading] = useState(false);
+  const analysisRequestRef = useRef(0);
 
   useEffect(() => {
+    analysisRequestRef.current += 1;
     setLocalScore(calculateATSScore(sections));
+    setAiAnalysis(null);
+    setLoading(false);
   }, [sections]);
 
   const runAIAnalysis = async () => {
+    if (jobDescription.trim().length < 40) {
+      toast.error('Paste a job description (at least 40 characters) to run a tailored analysis.');
+      return;
+    }
+    const requestId = ++analysisRequestRef.current;
     setLoading(true);
     try {
       const resumeContent = {};
       sections.forEach(s => { resumeContent[s.section_type] = s.content; });
-      const { data } = await aiAPI.atsScore({ resumeContent, jobDescription });
-      setAiAnalysis(data.data.analysis);
-      toast.success('ATS analysis complete!');
-    } catch {
-      toast.error('AI analysis failed');
+      const { data } = await aiAPI.atsScore({ resumeContent, jobDescription: jobDescription.trim() });
+      if (requestId === analysisRequestRef.current) {
+        setAiAnalysis(data.data.analysis);
+        toast.success('ATS analysis complete!');
+      }
+    } catch (error) {
+      if (requestId === analysisRequestRef.current) {
+        toast.error(error.response?.data?.message || 'AI analysis failed');
+      }
     } finally {
-      setLoading(false);
+      if (requestId === analysisRequestRef.current) setLoading(false);
     }
   };
 
-  const score = aiAnalysis?.overallScore ?? localScore;
+  const score = Math.max(0, Math.min(100, Number(aiAnalysis?.overallScore ?? localScore) || 0));
+  const completeness = calculateResumeCompleteness(sections);
+  const jobMatch = calculateJobDescriptionMatch(sections, jobDescription);
   const label = score >= 80 ? 'Excellent' : score >= 65 ? 'Good' : score >= 45 ? 'Fair' : 'Needs Work';
   const labelColor = score >= 80 ? 'var(--success)' : score >= 65 ? '#7bc67e' : score >= 45 ? 'var(--warning)' : 'var(--error)';
-
-  const checks = [
-    { label: 'Contact info present', ok: !!sections.find(s => s.section_type === 'personal_info')?.content?.email },
-    { label: 'Professional summary', ok: !!(sections.find(s => s.section_type === 'summary')?.content?.text?.length > 30) },
-    { label: 'Work experience added', ok: !!(sections.find(s => s.section_type === 'experience')?.content?.items?.length > 0) },
-    { label: 'Skills section filled', ok: !!sections.find(s => s.section_type === 'skills')?.content?.categories?.flatMap(c => c.skills || []).length },
-    { label: 'Education included', ok: !!(sections.find(s => s.section_type === 'education')?.content?.items?.length > 0) },
-    { label: 'LinkedIn profile', ok: !!sections.find(s => s.section_type === 'personal_info')?.content?.linkedin },
-  ];
 
   return (
     <div className="ats-widget">
@@ -79,8 +85,54 @@ export default function ATSScoreWidget({ sections, jobDescription = '' }) {
         <ScoreRing score={score} />
         <div className="ats-score-meta">
           <div className="ats-score-label" style={{ color: labelColor }}>{label}</div>
-          <div className="ats-score-sub">ATS Compatibility</div>
+          <div className="ats-score-sub">{aiAnalysis ? 'AI review + resume checks' : 'Based on resume completeness checks'}</div>
         </div>
+      </div>
+
+      <div className="insight-score-card">
+        <div><strong>{completeness.score}%</strong><span>Resume completeness</span></div>
+        <div><strong>{jobMatch.keywordCount ? `${jobMatch.score}%` : '—'}</strong><span>Job match</span></div>
+      </div>
+
+      <div className="insight-job-description">
+        <label htmlFor="job-description-input">Target job description</label>
+        <textarea
+          id="job-description-input"
+          className="form-textarea"
+          rows={5}
+          maxLength={5000}
+          value={jobDescription}
+          onChange={event => {
+            analysisRequestRef.current += 1;
+            setLoading(false);
+            onJobDescriptionChange(event.target.value);
+            setAiAnalysis(null);
+          }}
+          placeholder="Paste the job description to see keyword overlap and tailored suggestions..."
+        />
+        <span>{jobDescription.length}/5,000 characters · Missing terms are suggestions, not a request to add skills you don't have.</span>
+      </div>
+
+      {jobMatch.keywordCount > 0 && (
+        <div className="insight-keywords">
+          <div className="ats-missing-label"><Target size={13} /> Job keyword match ({jobMatch.matched.length}/{jobMatch.keywordCount})</div>
+          {jobMatch.missing.length > 0 ? (
+            <div className="ats-missing-tags">
+              {jobMatch.missing.slice(0, 10).map(keyword => <span className="ats-missing-tag" key={keyword}>{keyword}</span>)}
+            </div>
+          ) : <p className="insight-no-missing">All detected job terms appear in your resume.</p>}
+        </div>
+      )}
+
+      <div className="completeness-checklist">
+        <div className="ats-missing-label"><CheckCircle size={13} /> Resume completeness</div>
+        {completeness.checks.map(check => (
+          <div className={`ats-check-item ${check.complete ? 'ok' : 'warn'}`} key={check.label}>
+            {check.complete ? <CheckCircle size={13} /> : <AlertCircle size={13} />}
+            <span>{check.label}</span>
+            <span className="check-weight">{check.complete ? 'Done' : `${check.weight}%`}</span>
+          </div>
+        ))}
       </div>
 
       {/* Breakdown bars */}
@@ -91,26 +143,16 @@ export default function ATSScoreWidget({ sections, jobDescription = '' }) {
               <span className="ats-bar-label">{key.charAt(0).toUpperCase() + key.slice(1)}</span>
               <div className="ats-bar-track">
                 <motion.div className="ats-bar-fill"
-                  style={{ background: val >= 70 ? 'var(--success)' : val >= 50 ? 'var(--warning)' : 'var(--error)' }}
-                  initial={{ width: 0 }} animate={{ width: `${val}%` }}
+                  style={{ background: Number(val) >= 70 ? 'var(--success)' : Number(val) >= 50 ? 'var(--warning)' : 'var(--error)' }}
+                  initial={{ width: 0 }} animate={{ width: `${Math.max(0, Math.min(100, Number(val) || 0))}%` }}
                   transition={{ duration: 0.8, ease: 'easeOut' }}
                 />
               </div>
-              <span className="ats-bar-val">{val}%</span>
+              <span className="ats-bar-val">{Math.max(0, Math.min(100, Number(val) || 0))}%</span>
             </div>
           ))}
         </div>
       )}
-
-      {/* Checklist */}
-      <div className="ats-checklist">
-        {checks.map((c, i) => (
-          <div key={i} className={`ats-check-item ${c.ok ? 'ok' : 'warn'}`}>
-            {c.ok ? <CheckCircle size={13} /> : <AlertCircle size={13} />}
-            <span>{c.label}</span>
-          </div>
-        ))}
-      </div>
 
       {/* AI suggestions */}
       {aiAnalysis?.suggestions?.length > 0 && (
@@ -133,9 +175,17 @@ export default function ATSScoreWidget({ sections, jobDescription = '' }) {
           </div>
         </div>
       )}
+      {aiAnalysis?.strengths?.length > 0 && (
+        <div className="ats-suggestions">
+          <div className="ats-suggestions-label"><Sparkles size={13} /> What’s working</div>
+          {aiAnalysis.strengths.slice(0, 5).map((strength, index) => (
+            <div key={index} className="ats-suggestion-item">{strength}</div>
+          ))}
+        </div>
+      )}
 
       <button className="btn btn-secondary btn-sm btn-full ats-analyze-btn"
-        onClick={runAIAnalysis} disabled={loading}>
+        onClick={runAIAnalysis} disabled={loading || jobDescription.trim().length < 40}>
         <Zap size={13} /> {loading ? 'Analysing...' : 'Run AI Analysis'}
       </button>
     </div>

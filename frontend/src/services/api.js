@@ -49,6 +49,9 @@ export const resumeAPI = {
   delete: (id) => api.delete(`/resumes/${id}`),
   duplicate: (id) => api.post(`/resumes/${id}/duplicate`),
   updateSections: (id, sections) => api.put(`/resumes/${id}/sections`, { sections }),
+  getVersions: (id) => api.get(`/resumes/${id}/versions`),
+  createVersion: (id, versionName) => api.post(`/resumes/${id}/versions`, { versionName }),
+  restoreVersion: (id, versionId) => api.post(`/resumes/${id}/versions/${versionId}/restore`),
   getShared: (token) => api.get(`/resumes/shared/${token}`),
 };
 
@@ -64,12 +67,15 @@ export const aiAPI = {
   improveSection: (data) => api.post('/ai/improve-section', data),
   atsScore: (data) => api.post('/ai/ats-score', data),
   generateSummary: (data) => api.post('/ai/generate-summary', data),
+  rewriteBullet: (data) => api.post('/ai/rewrite-bullet', data),
 };
 
 // ════ Downloads ═══════════════════════════════
 export const downloadAPI = {
-  pdf: (id) => api.get(`/downloads/pdf/${id}`, { responseType: 'blob' }),
-  docx: (id) => api.get(`/downloads/docx/${id}`, { responseType: 'blob' }),
+  pdf: (id) => api.get(`/downloads/pdf/${id}`, { responseType: 'blob', timeout: 60000 }),
+  previewPDF: (id) => api.get(`/downloads/pdf/${id}?preview=1`, { responseType: 'blob', timeout: 60000 }),
+  trackPDF: (id, fileSizeBytes) => api.post(`/downloads/pdf/${id}/track`, { fileSizeBytes }),
+  docx: (id) => api.get(`/downloads/docx/${id}`, { responseType: 'blob', timeout: 60000 }),
 };
 
 // ════ Analytics ═══════════════════════════════

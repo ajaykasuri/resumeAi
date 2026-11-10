@@ -3,6 +3,7 @@ const { authenticate, optionalAuth } = require('../middleware/auth.middleware');
 const {
   getResumes, getResume, createResume, updateResume,
   deleteResume, duplicateResume, updateSections, getSharedResume,
+  getResumeVersions, createResumeVersion, restoreResumeVersion,
 } = require('../controllers/resume.controller');
 
 const router = express.Router();
@@ -10,6 +11,9 @@ const router = express.Router();
 router.get('/shared/:token', optionalAuth, getSharedResume);
 router.get('/', authenticate, getResumes);
 router.get('/:id', authenticate, getResume);
+router.get('/:id/versions', authenticate, getResumeVersions);
+router.post('/:id/versions', authenticate, createResumeVersion);
+router.post('/:id/versions/:versionId/restore', authenticate, restoreResumeVersion);
 router.post('/', authenticate, createResume);
 router.put('/:id', authenticate, updateResume);
 router.delete('/:id', authenticate, deleteResume);

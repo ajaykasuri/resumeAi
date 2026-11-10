@@ -76,6 +76,7 @@ export function ResumeProvider({ children }) {
 
   const reorderSections = useCallback((newOrder) => {
     setSections(newOrder.map((s, i) => ({ ...s, sort_order: i + 1 })));
+    setCustomization(prev => ({ ...prev, customSectionOrder: true }));
     setIsDirty(true);
   }, []);
 
@@ -99,8 +100,19 @@ export function ResumeProvider({ children }) {
     setIsDirty(true);
   }, [sections.length]);
 
-  const applyAIContent = useCallback((aiContent) => {
-    setSections(prev => prev.map(s => {
+  const applyAIContent = useCallback((aiContent, personalInfo = {}) => {
+    const nextSections = sectionsRef.current.map(s => {
+      if (s.section_type === 'personal_info') {
+        return {
+          ...s,
+          is_visible: true,
+          content: {
+            ...s.content,
+            ...(personalInfo.name ? { name: personalInfo.name } : {}),
+            ...(personalInfo.title ? { title: personalInfo.title } : {}),
+          },
+        };
+      }
       if (s.section_type === 'summary' && aiContent.summary) {
         return { ...s, is_visible: true, content: { text: aiContent.summary } };
       }
@@ -117,22 +129,25 @@ export function ResumeProvider({ children }) {
         return { ...s, is_visible: true, content: { items: aiContent.certifications } };
       }
       return s;
-    }));
+    });
+    sectionsRef.current = nextSections;
+    setSections(nextSections);
     setIsDirty(true);
+    return nextSections;
   }, []);
 
-  const saveResume = useCallback(async (resumeUpdates = {}) => {
+  const saveResume = useCallback(async (resumeUpdates = {}, sectionsToSave = sections) => {
     if (!resumeId) return false;
     setIsSaving(true);
     try {
-      await resumeAPI.updateSections(resumeId, sections);
+      await resumeAPI.updateSections(resumeId, sectionsToSave);
       const updates = {
         customization,
         templateId: customization.templateSlug,
         ...resumeUpdates,
       };
       await resumeAPI.update(resumeId, updates);
-      if (sectionsRef.current === sections && customizationRef.current === customization) {
+      if (sectionsRef.current === sectionsToSave && customizationRef.current === customization) {
         setIsDirty(false);
       }
       return true;

@@ -28,6 +28,7 @@ async function migrate() {
     console.log('   - templates (with 8 default templates)');
     console.log('   - resumes');
     console.log('   - resume_sections');
+    console.log('   - resume_versions');
     console.log('   - ai_resume_cache');
     console.log('   - ai_generation_history');
     console.log('   - downloads');

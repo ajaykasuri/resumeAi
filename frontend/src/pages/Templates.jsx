@@ -194,6 +194,7 @@ function LightboxPreview({ template, templates, onClose, onUse, onNavigate }) {
   }, [onClose, onNavigate]);
 
   const customization = buildCustomization(template, { templateSlug: template.slug });
+  const layoutName = String(customization.layout || template.slug || 'classic');
   const idx = templates.findIndex(t => t.id === template.id);
 
   return (
@@ -236,7 +237,7 @@ function LightboxPreview({ template, templates, onClose, onUse, onNavigate }) {
             <div className="lightbox-meta-row">
               <span className="lightbox-meta-label">Layout</span>
               <span className="lightbox-meta-val" style={{ textTransform: 'capitalize' }}>
-                {customization.layout.replace('-', ' ')}
+                {layoutName.replace(/-/g, ' ')}
               </span>
             </div>
             <div className="lightbox-meta-row">

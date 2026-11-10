@@ -1,4 +1,4 @@
-.ats-widget { display: flex; flex-direction: column; gap: 14px; padding: 16px; }
+.ats-widget { display: flex; flex-direction: column; gap: 14px; padding: 16px; overflow-y: auto; }
 
 .ats-header { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-secondary); }
 
@@ -31,3 +31,15 @@
 .ats-missing-tag { padding: 2px 8px; border-radius: var(--radius-full); background: rgba(255,179,71,0.1); border: 1px solid rgba(255,179,71,0.2); color: var(--warning); font-size: 0.72rem; }
 
 .ats-analyze-btn { margin-top: 4px; }
+
+.insight-score-card { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.insight-score-card > div { display: flex; flex-direction: column; gap: 2px; padding: 10px; background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); }
+.insight-score-card strong { color: var(--text-primary); font-size: 1.15rem; }
+.insight-score-card span, .insight-job-description > span { color: var(--text-muted); font-size: 0.72rem; line-height: 1.4; }
+.insight-job-description { display: flex; flex-direction: column; gap: 6px; }
+.insight-job-description label { color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; }
+.insight-job-description .form-textarea { min-height: 100px; font-size: 0.8rem; }
+.insight-keywords .ats-missing-label, .completeness-checklist .ats-missing-label { display: flex; align-items: center; gap: 6px; }
+.insight-no-missing { color: var(--success); font-size: 0.78rem; }
+.completeness-checklist { display: flex; flex-direction: column; gap: 7px; }
+.check-weight { margin-left: auto; font-size: 0.68rem; color: var(--text-muted); }

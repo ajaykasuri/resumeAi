@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   DndContext, closestCenter, KeyboardSensor, PointerSensor,
-  useSensor, useSensors, DragOverlay
+  useSensor, useSensors
 } from '@dnd-kit/core';
 import {
   SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy,
@@ -12,16 +12,20 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import {
   Save, Download, Eye, EyeOff, ChevronRight, ChevronLeft,
-  GripVertical, Plus, Settings, Palette, LayoutTemplate, Zap,
-  FileText, ArrowLeft, Check, Sparkles, ZoomIn, ZoomOut,
-  MoreVertical, Layers
+  GripVertical, Plus, Palette, LayoutTemplate,
+  FileText, ArrowLeft, Check, ZoomIn, ZoomOut,
+  Layers, BarChart3, Clock3
 } from 'lucide-react';
 import { useResume } from '../context/ResumeContext';
 import { resumeAPI, downloadAPI } from '../services/api';
 import ResumePreview from '../components/resume/ResumePreview';
+import { saveBlob, safeFileName, readBlobError } from '../utils/downloadFile';
 import { SectionEditor } from '../components/resume/SectionEditors';
 import CustomizationPanel from '../components/resume/CustomizationPanel';
 import TemplateSelectionPanel from '../components/resume/TemplateSelectionPanel';
+import ATSScoreWidget from '../components/resume/ATSScoreWidget';
+import ResumeVersionsPanel from '../components/resume/ResumeVersionsPanel';
+import ExportPreviewModal from '../components/resume/ExportPreviewModal';
 import toast from 'react-hot-toast';
 import './ResumeBuilder.css';
 
@@ -64,7 +68,7 @@ export default function ResumeBuilder() {
   const { id } = useParams();
   const navigate = useNavigate();
   const {
-    sections, setSections, customization, setCustomization,
+    sections, customization,
     isSaving, isDirty, loadResume, updateSection, updateCustomization,
     reorderSections, toggleSection, addCustomSection, saveResume, resetResume,
   } = useResume();
@@ -78,6 +82,8 @@ export default function ResumeBuilder() {
     : -1;
   const [activeTab, setActiveTab] = useState('content');
   const [showTemplateSelection, setShowTemplateSelection] = useState(false);
+  const [showExportPreview, setShowExportPreview] = useState(false);
+  const [jobDescription, setJobDescription] = useState('');
   const [loading, setLoading] = useState(!!id);
   const [previewScale, setPreviewScale] = useState(0.6);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -99,7 +105,7 @@ export default function ResumeBuilder() {
       resetResume();
       setLoading(false);
     }
-  }, [id]);
+  }, [id, loadResume, navigate, resetResume]);
 
   const handleDragEnd = useCallback(({ active, over }) => {
     if (!over || active.id === over.id) return;
@@ -146,6 +152,7 @@ export default function ResumeBuilder() {
       ...customization,
       ...(template.config || {}),
       templateSlug: template.slug,
+      customSectionOrder: false,
     };
     updateCustomization(nextCustomization);
     if (await saveResume({ customization: nextCustomization, templateId: template.slug })) {
@@ -176,26 +183,46 @@ export default function ResumeBuilder() {
     if (!id) { toast.error('Save your resume first'); return; }
     setDownloading(true);
     try {
+      if (!await saveResume({ title: resumeTitle.trim() || 'Untitled Resume' })) return;
+      // The server generates and records the PDF download, including its actual byte size.
       const { data } = await downloadAPI.pdf(id);
-      const url = URL.createObjectURL(new Blob([data], { type: 'application/pdf' }));
-      const a = document.createElement('a'); a.href = url; a.download = `${resumeTitle}.pdf`; a.click();
-      URL.revokeObjectURL(url);
+      saveBlob(new Blob([data], { type: 'application/pdf' }), `${safeFileName(resumeTitle)}.pdf`);
       toast.success('PDF downloaded!');
-    } catch { toast.error('PDF download failed. Check backend config.'); }
-    finally { setDownloading(false); }
+    } catch (error) {
+      console.error('PDF export failed:', error);
+      toast.error(await readBlobError(error, 'PDF download failed.'));
+    } finally { setDownloading(false); }
   };
 
   const handleDownloadDOCX = async () => {
     if (!id) { toast.error('Save your resume first'); return; }
     setDownloading(true);
     try {
+      if (!await saveResume({ title: resumeTitle.trim() || 'Untitled Resume' })) return;
       const { data } = await downloadAPI.docx(id);
-      const url = URL.createObjectURL(new Blob([data]));
-      const a = document.createElement('a'); a.href = url; a.download = `${resumeTitle}.docx`; a.click();
-      URL.revokeObjectURL(url);
-      toast.success('DOCX downloaded!');
-    } catch { toast.error('DOCX download failed'); }
-    finally { setDownloading(false); }
+      saveBlob(
+        new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }),
+        `${safeFileName(resumeTitle)}.docx`
+      );
+      toast.success('Word file downloaded!');
+    } catch (error) {
+      console.error('DOCX export failed:', error);
+      toast.error(await readBlobError(error, 'Word download failed.'));
+    } finally { setDownloading(false); }
+  };
+
+  const handlePrepareExportPreview = useCallback(async () => {
+    if (!id) return false;
+    const title = resumeTitle.trim() || 'Untitled Resume';
+    const saved = await saveResume({ title });
+    if (saved) setResumeTitle(title);
+    return saved;
+  }, [id, resumeTitle, saveResume]);
+
+  const handleRestoreVersion = async () => {
+    const restored = await loadResume(id);
+    setResumeTitle(restored.title || 'Untitled Resume');
+    setActiveSectionId(restored.sections?.[0]?.id || restored.sections?.[0]?.section_type || null);
   };
 
   const handleAddSection = (type) => {
@@ -213,7 +240,7 @@ export default function ResumeBuilder() {
     const personal = sections.find(s => s.section_type === 'personal_info')?.content;
     const skills = sections.find(s => s.section_type === 'skills')?.content;
     const allSkills = skills?.categories?.flatMap(c => c.skills || []).join(', ') || '';
-    return { name: personal?.name, jobRole: personal?.title, skills: allSkills };
+    return { name: personal?.name, jobRole: personal?.title, skills: allSkills, jobDescription };
   };
 
   const ADDABLE_SECTIONS = ['projects', 'certifications', 'achievements', 'languages', 'interests', 'declaration', 'publications', 'volunteer', 'custom'];
@@ -244,6 +271,9 @@ export default function ResumeBuilder() {
         <div className="builder-topbar-actions">
           <button className="btn btn-secondary btn-sm" onClick={openTemplateSelection}>
             <LayoutTemplate size={14} /> Template
+          </button>
+          <button className="btn btn-secondary btn-sm" onClick={() => setShowExportPreview(true)}>
+            <Eye size={14} /> Preview
           </button>
           <div className="zoom-controls">
             <button className="btn btn-ghost btn-icon btn-sm" onClick={() => setPreviewScale(p => Math.max(0.4, p - 0.1))}><ZoomOut size={14} /></button>
@@ -279,6 +309,8 @@ export default function ResumeBuilder() {
                   { key: 'content', icon: <FileText size={14} />, label: 'Content' },
                   { key: 'sections', icon: <Layers size={14} />, label: 'Sections' },
                   { key: 'design', icon: <Palette size={14} />, label: 'Design' },
+                  { key: 'insights', icon: <BarChart3 size={14} />, label: 'Insights' },
+                  { key: 'history', icon: <Clock3 size={14} />, label: 'History' },
                 ].map(tab => (
                   <button key={tab.key} className={`builder-tab ${activeTab === tab.key ? 'active' : ''}`}
                     onClick={() => setActiveTab(tab.key)}>
@@ -372,6 +404,20 @@ export default function ResumeBuilder() {
                   <CustomizationPanel customization={customization} onChange={updateCustomization} />
                 </div>
               )}
+              {activeTab === 'insights' && (
+                <ATSScoreWidget
+                  sections={sections}
+                  jobDescription={jobDescription}
+                  onJobDescriptionChange={setJobDescription}
+                />
+              )}
+              {activeTab === 'history' && (
+                <ResumeVersionsPanel
+                  resumeId={id}
+                  onSaveCurrent={handlePrepareExportPreview}
+                  onRestore={handleRestoreVersion}
+                />
+              )}
             </>
           )}
         </aside>}
@@ -400,6 +446,18 @@ export default function ResumeBuilder() {
           />
         )}
       </div>
+      {showExportPreview && (
+        <ExportPreviewModal
+          resumeId={id}
+          title={resumeTitle}
+          sections={sections}
+          customization={customization}
+          onClose={() => setShowExportPreview(false)}
+          onPrepare={handlePrepareExportPreview}
+          onDownloadPDF={handleDownloadPDF}
+          onDownloadDOCX={handleDownloadDOCX}
+        />
+      )}
     </div>
   );
 }

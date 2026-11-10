@@ -199,7 +199,7 @@ cd backend
 npm run db:migrate
 ```
 
-This creates the `ai_resume_builder` database with all 10 tables and seeds 8 default templates.
+This creates the `ai_resume_builder` database with all 11 tables and seeds 8 default templates. The version-history table is also created automatically when the version-history API is first used.
 
 **OR** run manually:
 ```bash
@@ -354,6 +354,7 @@ guest_sessions      → Temporary guest access tokens
 templates           → Resume template definitions
 resumes             → Resume metadata and settings
 resume_sections     → Individual resume section content (JSON)
+resume_versions    → Named resume snapshots with restore support
 ai_resume_cache     → Cached AI-generated content for reuse
 ai_generation_history → Log of all AI generation requests
 downloads           → PDF/DOCX download tracking

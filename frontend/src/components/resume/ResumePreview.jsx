@@ -1,5 +1,5 @@
 import React from 'react';
-import { getTemplateDefaults,buildCustomization  } from '../../../src/Templateconfigs'; // adjust path
+import { getTemplateDefaults } from '../../../src/Templateconfigs'; // adjust path
 
 /* ────────────────────────────────────────────────
    Data helpers — turn the `sections` array into one object
@@ -68,7 +68,7 @@ function Classic({ d, t }) {
 
       {d.exp.length > 0 && H('Experience')}
       {d.exp.map((e, i) => (
-        <div key={i} style={{ marginBottom: 11 }}>
+        <div key={i} style={{ breakInside: 'avoid', marginBottom: 11 }}>
           <Split left={<b>{e.company}{e.location && `, ${e.location}`}</b>} right={range(e.startDate, e.endDate)} />
           <div style={{ fontStyle: 'italic' }}>{e.jobTitle}</div>
           <Bullets items={e.bullets} />
@@ -77,7 +77,7 @@ function Classic({ d, t }) {
 
       {d.edu.length > 0 && H('Education')}
       {d.edu.map((e, i) => (
-        <div key={i} style={{ marginBottom: 6 }}>
+        <div key={i} style={{ breakInside: 'avoid', marginBottom: 6 }}>
           <Split left={<b>{e.institution}{e.location && `, ${e.location}`}</b>} right={range(e.startYear, e.endYear)} />
           <div>{e.degree}{e.gpa && ` — GPA ${e.gpa}`}</div>
         </div>
@@ -85,14 +85,14 @@ function Classic({ d, t }) {
 
       {d.skills && H('Skills')}
       {groups(d.skills).map((g, i) => (
-        <div key={i} style={{ marginBottom: 3 }}>
+        <div key={i} style={{ breakInside: 'avoid', marginBottom: 3 }}>
           {g.name && <b>{g.name}: </b>}{(g.skills || []).join(', ')}
         </div>
       ))}
 
       {d.proj.length > 0 && H('Projects')}
       {d.proj.map((x, i) => (
-        <div key={i} style={{ marginBottom: 7 }}>
+        <div key={i} style={{ breakInside: 'avoid', marginBottom: 7 }}>
           <b>{x.name}</b>{x.link && <span style={{ opacity: 0.7 }}> — {x.link}</span>}
           <div>{x.description}</div>
           <div style={{ fontStyle: 'italic', fontSize: '0.92em' }}>{list(x.technologies).join(', ')}</div>
@@ -120,7 +120,7 @@ function ModernSidebar({ d, t }) {
     </h3>
   );
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '256px 1fr', minHeight: 1123 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: '256px 1fr', minHeight: 'var(--page-min, 1123px)' }}>
       <aside style={{ background: t.primary, color: '#e8f0f1', padding: '44px 24px' }}>
         <div style={{ width: 84, height: 84, borderRadius: '50%', background: t.accent, color: t.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2em', fontWeight: 700 }}>
           {initials(d.p.name)}
@@ -130,7 +130,7 @@ function ModernSidebar({ d, t }) {
 
         {SH('Skills')}
         {groups(d.skills).map((g, i) => (
-          <div key={i} style={{ marginBottom: 10 }}>
+          <div key={i} style={{ breakInside: 'avoid', marginBottom: 10 }}>
             <div style={{ fontWeight: 600, fontSize: '0.88em', color: '#fff', marginBottom: 4 }}>{g.name}</div>
             {(g.skills || []).map((s, j) => (
               <div key={j} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.88em', marginBottom: 3 }}>
@@ -166,7 +166,7 @@ function ModernSidebar({ d, t }) {
 
         {d.exp.length > 0 && MH('Experience')}
         {d.exp.map((e, i) => (
-          <div key={i} style={{ marginBottom: 14 }}>
+          <div key={i} style={{ breakInside: 'avoid', marginBottom: 14 }}>
             <Split left={<b style={{ fontSize: '1.05em' }}>{e.jobTitle}</b>} right={range(e.startDate, e.endDate)} />
             <div style={{ color: t.accent, fontWeight: 600 }}>{e.company}{e.location && ` · ${e.location}`}</div>
             <Bullets items={e.bullets} />
@@ -175,7 +175,7 @@ function ModernSidebar({ d, t }) {
 
         {d.proj.length > 0 && MH('Projects')}
         {d.proj.map((x, i) => (
-          <div key={i} style={{ marginBottom: 10 }}>
+          <div key={i} style={{ breakInside: 'avoid', marginBottom: 10 }}>
             <b>{x.name}</b>
             <div>{x.description}</div>
             <div style={{ marginTop: 3 }}>{list(x.technologies).map((s) => <Pill key={s} bg="#e6f0f1" color={t.primary}>{s}</Pill>)}</div>
@@ -198,7 +198,7 @@ function Minimal({ d, t }) {
   );
   const Row = ({ when, children }) => (
     <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr', marginBottom: 13 }}>
-      <div style={{ fontSize: '0.88em', color: t.accent, paddingTop: 2 }}>{when}</div>
+      <div style={{ fontSize: '0.88em', color: t.accent, paddingTop: 2, paddingRight: 10, overflowWrap: 'anywhere' }}>{when}</div>
       <div>{children}</div>
     </div>
   );
@@ -230,7 +230,11 @@ function Minimal({ d, t }) {
 
       {d.proj.length > 0 && H('Projects')}
       {d.proj.map((x, i) => (
-        <Row key={i} when={x.link}><b style={{ fontWeight: 600 }}>{x.name}</b><div style={{ color: '#555' }}>{x.description}</div></Row>
+        <Row key={i} when="">
+          <b style={{ fontWeight: 600 }}>{x.name}</b>
+          {x.link && <span style={{ color: t.accent, fontSize: '0.88em', marginLeft: 8, overflowWrap: 'anywhere' }}>{x.link}</span>}
+          <div style={{ color: '#555' }}>{x.description}</div>
+        </Row>
       ))}
 
       {d.cert.length > 0 && H('Certifications')}
@@ -250,7 +254,7 @@ function Executive({ d, t }) {
     <h4 style={{ fontFamily: t.head, fontSize: '1.1em', color: t.primary, margin: '22px 0 8px', paddingBottom: 4, borderBottom: `2px solid ${t.accent}` }}>{txt}</h4>
   );
   return (
-    <div>
+    <div style={{ display: 'flex', flexDirection: 'column', boxSizing: 'border-box', minHeight: 'var(--page-min, 1123px)' }}>
       <header style={{ background: t.primary, color: '#fff', padding: '42px 50px 30px' }}>
         <h1 style={{ fontFamily: t.head, fontSize: '3em', fontWeight: 700, margin: 0, letterSpacing: '0.01em' }}>{d.p.name}</h1>
         <div style={{ color: t.accent, fontSize: '1.15em', fontWeight: 600, margin: '4px 0 12px' }}>{d.p.title}</div>
@@ -259,12 +263,12 @@ function Executive({ d, t }) {
         </div>
       </header>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 232px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 232px', flex: 1 }}>
         <main style={{ padding: '10px 30px 40px 50px' }}>
           {d.summary && <>{H('Executive Profile')}<p style={{ margin: 0 }}>{d.summary}</p></>}
           {d.exp.length > 0 && H('Career History')}
           {d.exp.map((e, i) => (
-            <div key={i} style={{ marginBottom: 14 }}>
+            <div key={i} style={{ breakInside: 'avoid', marginBottom: 14 }}>
               <Split left={<b style={{ fontSize: '1.05em' }}>{e.jobTitle}</b>} right={range(e.startDate, e.endDate)} />
               <div style={{ fontStyle: 'italic', color: '#555' }}>{e.company}, {e.location}</div>
               <Bullets items={e.bullets} />
@@ -272,14 +276,14 @@ function Executive({ d, t }) {
           ))}
           {d.proj.length > 0 && H('Key Initiatives')}
           {d.proj.map((x, i) => (
-            <div key={i} style={{ marginBottom: 8 }}><b>{x.name}</b> — {x.description}</div>
+            <div key={i} style={{ breakInside: 'avoid', marginBottom: 8 }}><b>{x.name}</b> — {x.description}</div>
           ))}
         </main>
 
-        <aside style={{ background: '#f2f3f6', padding: '10px 24px 40px', minHeight: 900 }}>
+        <aside style={{ background: '#f2f3f6', padding: '10px 24px 40px' }}>
           {d.skills && RH('Core Competencies')}
           {groups(d.skills).map((g, i) => (
-            <div key={i} style={{ marginBottom: 8, fontSize: '0.92em' }}>
+            <div key={i} style={{ breakInside: 'avoid', marginBottom: 8, fontSize: '0.92em' }}>
               <b style={{ color: t.primary }}>{g.name}</b>
               <div>{(g.skills || []).join(' · ')}</div>
             </div>
@@ -308,7 +312,7 @@ function Executive({ d, t }) {
 ════════════════════════════════════════════════ */
 function Creative({ d, t }) {
   const H = (txt) => (
-    <h3 style={{ fontSize: '1.25em', fontWeight: 700, color: t.primary, margin: '24px 0 10px', display: 'inline-block', padding: '2px 0', borderBottom: `4px solid ${t.accent}` }}>{txt}</h3>
+    <h3 style={{ fontSize: '1.25em', fontWeight: 700, color: t.primary, margin: '24px 0 10px', display: 'table', padding: '2px 0', borderBottom: `4px solid ${t.accent}` }}>{txt}</h3>
   );
   return (
     <div>
@@ -326,7 +330,7 @@ function Creative({ d, t }) {
 
         {d.exp.length > 0 && H('Experience')}
         {d.exp.map((e, i) => (
-          <div key={i} style={{ marginBottom: 14 }}>
+          <div key={i} style={{ breakInside: 'avoid', marginBottom: 14 }}>
             <Split left={<><b style={{ fontSize: '1.05em' }}>{e.jobTitle}</b> <span style={{ color: t.accent, fontWeight: 600 }}>@ {e.company}</span></>} right={range(e.startDate, e.endDate)} />
             <Bullets items={e.bullets} />
           </div>
@@ -351,7 +355,7 @@ function Creative({ d, t }) {
           <div>
             {d.cert.length > 0 && H('Certifications')}
             {d.cert.map((c, i) => (
-              <div key={i} style={{ marginBottom: 6 }}><b>{c.name}</b><div style={{ opacity: 0.7 }}>{c.issuer} · {c.date}</div></div>
+              <div key={i} style={{ breakInside: 'avoid', marginBottom: 6 }}><b>{c.name}</b><div style={{ opacity: 0.7 }}>{c.issuer} · {c.date}</div></div>
             ))}
           </div>
         </div>
@@ -375,7 +379,7 @@ function Tech({ d, t }) {
       <header style={{ borderBottom: `2px solid ${t.primary}`, paddingBottom: 14 }}>
         <div style={{ ...mono, fontSize: '0.85em', color: t.accent }}>$ whoami</div>
         <h1 style={{ ...mono, fontSize: '2.4em', fontWeight: 700, color: t.primary, margin: '2px 0' }}>{d.p.name}</h1>
-        <div style={{ ...mono, fontSize: '1em', color: '#555' }}>// {d.p.title}</div>
+        <div style={{ ...mono, fontSize: '1em', color: '#555' }}>{`// ${d.p.title || ''}`}</div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px 18px', marginTop: 10, fontSize: '0.88em' }}>
           {contacts(d.p).map((c, i) => <span key={i}>{c}</span>)}
         </div>
@@ -395,7 +399,7 @@ function Tech({ d, t }) {
 
       {d.exp.length > 0 && H('Experience')}
       {d.exp.map((e, i) => (
-        <div key={i} style={{ marginBottom: 11 }}>
+        <div key={i} style={{ breakInside: 'avoid', marginBottom: 11 }}>
           <Split left={<><b>{e.jobTitle}</b> <span style={{ color: t.accent }}>@{e.company}</span></>} right={<span style={mono}>{range(e.startDate, e.endDate)}</span>} />
           <Bullets items={e.bullets} />
         </div>
@@ -403,7 +407,7 @@ function Tech({ d, t }) {
 
       {d.proj.length > 0 && H('Projects')}
       {d.proj.map((x, i) => (
-        <div key={i} style={{ marginBottom: 8, padding: '7px 10px', background: '#f6f8fa', border: '1px solid #e1e6eb', borderRadius: 4 }}>
+        <div key={i} style={{ breakInside: 'avoid', marginBottom: 8, padding: '7px 10px', background: '#f6f8fa', border: '1px solid #e1e6eb', borderRadius: 4 }}>
           <Split left={<b style={mono}>{x.name}</b>} right={<span style={mono}>{x.link}</span>} />
           <div>{x.description}</div>
           <div style={{ ...mono, fontSize: '0.8em', color: t.accent, marginTop: 2 }}>[{list(x.technologies).join(', ')}]</div>
@@ -417,7 +421,7 @@ function Tech({ d, t }) {
         </div>
         <div>
           {d.cert.length > 0 && H('Certifications')}
-          {d.cert.map((c, i) => <div key={i} style={{ marginBottom: 4 }}><b>{c.name}</b><div style={{ opacity: 0.7 }}>{c.issuer} · {c.date}</div></div>)}
+          {d.cert.map((c, i) => <div key={i} style={{ breakInside: 'avoid', marginBottom: 4 }}><b>{c.name}</b><div style={{ opacity: 0.7 }}>{c.issuer} · {c.date}</div></div>)}
         </div>
       </div>
     </div>
@@ -434,19 +438,19 @@ function Elegant({ d, t }) {
     </h3>
   );
   return (
-    <div style={{ padding: '48px 0 0' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', boxSizing: 'border-box', padding: '48px 0 0', minHeight: 'var(--page-min, 1123px)' }}>
       <header style={{ padding: '0 52px 22px' }}>
         <h1 style={{ fontFamily: t.head, fontSize: '3.4em', fontWeight: 600, color: t.primary, margin: 0, lineHeight: 1 }}>{d.p.name}</h1>
         <div style={{ width: 64, height: 3, background: t.accent, margin: '12px 0 10px' }} />
         <div style={{ fontStyle: 'italic', fontSize: '1.2em', color: '#555' }}>{d.p.title}</div>
       </header>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 238px', minHeight: 900 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 238px', flex: 1 }}>
         <main style={{ padding: '0 28px 40px 52px' }}>
           {d.summary && <>{H('Profile')}<p style={{ margin: 0 }}>{d.summary}</p></>}
           {d.exp.length > 0 && H('Experience')}
           {d.exp.map((e, i) => (
-            <div key={i} style={{ marginBottom: 13 }}>
+            <div key={i} style={{ breakInside: 'avoid', marginBottom: 13 }}>
               <b style={{ fontSize: '1.05em' }}>{e.jobTitle}</b>
               <div style={{ color: t.accent, fontStyle: 'italic' }}>{e.company}, {e.location} · {range(e.startDate, e.endDate)}</div>
               <Bullets items={e.bullets} />
@@ -454,7 +458,7 @@ function Elegant({ d, t }) {
           ))}
           {d.proj.length > 0 && H('Projects')}
           {d.proj.map((x, i) => (
-            <div key={i} style={{ marginBottom: 8 }}><b>{x.name}</b><div>{x.description}</div></div>
+            <div key={i} style={{ breakInside: 'avoid', marginBottom: 8 }}><b>{x.name}</b><div>{x.description}</div></div>
           ))}
         </main>
 
@@ -464,7 +468,7 @@ function Elegant({ d, t }) {
 
           <h4 style={{ fontFamily: t.head, fontVariant: 'small-caps', fontSize: '1.2em', color: t.primary, margin: '22px 0 8px' }}>Expertise</h4>
           {groups(d.skills).map((g, i) => (
-            <div key={i} style={{ marginBottom: 8, fontSize: '0.9em' }}>
+            <div key={i} style={{ breakInside: 'avoid', marginBottom: 8, fontSize: '0.9em' }}>
               <i style={{ color: t.primary }}>{g.name}</i>
               <div>{(g.skills || []).join(', ')}</div>
             </div>
@@ -495,7 +499,7 @@ function Timeline({ d, t }) {
     <h3 style={{ fontSize: '1.15em', fontWeight: 700, color: t.primary, margin: '24px 0 12px' }}>{txt}</h3>
   );
   const Node = ({ when, last, children }) => (
-    <div style={{ display: 'grid', gridTemplateColumns: '104px 18px 1fr', columnGap: 6 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: '104px 18px 1fr', columnGap: 6, breakInside: 'avoid' }}>
       <div style={{ textAlign: 'right', fontSize: '0.86em', color: '#666', paddingTop: 1 }}>{when}</div>
       <div style={{ position: 'relative' }}>
         <span style={{ position: 'absolute', left: 4, top: 4, width: 10, height: 10, borderRadius: '50%', background: '#fff', border: `3px solid ${t.accent}` }} />
@@ -546,7 +550,7 @@ function Timeline({ d, t }) {
 
       {d.proj.length > 0 && H('Projects')}
       {d.proj.map((x, i) => (
-        <div key={i} style={{ marginBottom: 8 }}><b>{x.name}</b> <span style={{ color: '#777' }}>{x.link}</span><div>{x.description}</div></div>
+        <div key={i} style={{ breakInside: 'avoid', marginBottom: 8 }}><b>{x.name}</b> <span style={{ color: '#777' }}>{x.link}</span><div>{x.description}</div></div>
       ))}
 
       {d.cert.length > 0 && H('Certifications')}
@@ -580,12 +584,148 @@ const TEMPLATE_LAYOUTS = {
   'fresh-graduate': 'timeline',
 };
 
+const ORDERED_SECTION_TITLES = {
+  summary: 'Professional Summary',
+  objective: 'Career Objective',
+  experience: 'Work Experience',
+  education: 'Education',
+  skills: 'Skills',
+  projects: 'Projects',
+  certifications: 'Certifications',
+  achievements: 'Achievements',
+  languages: 'Languages',
+  interests: 'Interests',
+  declaration: 'Declaration',
+  publications: 'Publications',
+  volunteer: 'Volunteer Work',
+  awards: 'Awards & Recognition',
+  references: 'References',
+  custom: 'Additional Information',
+};
+
+function OrderedResume({ sections, t, layout }) {
+  const personal = sections.find(section => section.section_type === 'personal_info')?.content || {};
+  const contacts = [personal.email, personal.phone, personal.location, personal.linkedin, personal.website]
+    .filter(value => typeof value === 'string' && value.trim());
+  const visibleSections = sections
+    .filter(section => section.section_type !== 'personal_info' && section.is_visible !== false && section.is_visible !== 0)
+    .slice()
+    .sort((a, b) => Number(a.sort_order || 0) - Number(b.sort_order || 0));
+  const headingStyle = {
+    color: t.primary,
+    borderBottom: `2px solid ${t.accent}`,
+    fontSize: '1.05em',
+    letterSpacing: '0.08em',
+    margin: '22px 0 9px',
+    paddingBottom: 4,
+    textTransform: 'uppercase',
+  };
+  const itemTitle = item => item.jobTitle || item.name || item.title || item.degree || item.institution || item.language || item.skill;
+  const itemDetails = item => [
+    item.company,
+    item.institution && item.institution !== itemTitle(item) ? item.institution : null,
+    item.location,
+    [item.startDate, item.endDate].filter(Boolean).join(' – '),
+    [item.startYear, item.endYear].filter(Boolean).join(' – '),
+    item.issuer,
+    item.date,
+    item.level,
+    Array.isArray(item.technologies) ? item.technologies.join(', ') : item.technologies,
+    item.link,
+  ].filter(value => typeof value === 'string' && value.trim()).join(' · ');
+
+  const renderSection = section => {
+    const content = section.content || {};
+    const items = Array.isArray(content.items) ? content.items : [];
+    const categories = Array.isArray(content.categories) ? content.categories.filter(Boolean) : [];
+    const hasValue = value => {
+      if (typeof value === 'string') return value.trim().length > 0;
+      if (typeof value === 'number') return Number.isFinite(value);
+      if (Array.isArray(value)) return value.some(hasValue);
+      if (value && typeof value === 'object') return Object.values(value).some(hasValue);
+      return false;
+    };
+    const skills = categories.flatMap(category =>
+      Array.isArray(category.skills) ? category.skills.filter(hasValue) : []
+    );
+    const hasContent = hasValue(content.text) || skills.length > 0 || hasValue(content.items);
+    if (!hasContent) return null;
+
+    return (
+      <section key={section.id || section.section_type} style={{ breakInside: 'avoid' }}>
+        <h3 style={headingStyle}>{section.custom_title || ORDERED_SECTION_TITLES[section.section_type] || section.section_type}</h3>
+        {(section.section_type === 'summary' || section.section_type === 'objective') && (
+          <p style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{content.text}</p>
+        )}
+        {section.section_type === 'skills' && (
+          <div>
+            {categories.map((category, index) => (
+              <p key={`${category.name}-${index}`} style={{ margin: '0 0 5px' }}>
+                {category.name && categories.length > 1 && <b>{category.name}: </b>}
+                {(category.skills || []).join(' · ')}
+              </p>
+            ))}
+            {Array.isArray(content.items) && <p style={{ margin: 0 }}>{content.items.join(' · ')}</p>}
+          </div>
+        )}
+        {!['summary', 'objective', 'skills'].includes(section.section_type) && items.map((item, index) => {
+          if (!item) return null;
+          if (typeof item === 'string') return <p key={index} style={{ margin: '0 0 6px' }}>{item}</p>;
+          const title = itemTitle(item);
+          const details = itemDetails(item);
+          const bullets = Array.isArray(item.bullets) ? item.bullets : [];
+          const highlights = Array.isArray(item.highlights) ? item.highlights : [];
+          return (
+            <div key={index} style={{ marginBottom: 9 }}>
+              {title && <div style={{ fontWeight: 700 }}>{title}</div>}
+              {details && <div style={{ color: '#666', fontSize: '0.92em' }}>{details}</div>}
+              {item.description && <p style={{ margin: '3px 0' }}>{item.description}</p>}
+              {[...bullets, ...highlights].map((bullet, bulletIndex) => (
+                <div key={bulletIndex} style={{ marginLeft: 14 }}>• {bullet}</div>
+              ))}
+            </div>
+          );
+        })}
+        {section.section_type !== 'skills' && typeof content.text === 'string' && content.text.trim() &&
+          !['summary', 'objective'].includes(section.section_type) && <p style={{ margin: 0 }}>{content.text}</p>}
+      </section>
+    );
+  };
+
+  return (
+    <div style={{ padding: '42px 54px', minHeight: 'var(--page-min, 1123px)' }}>
+      <header style={{
+        background: ['executive', 'creative'].includes(layout) ? t.primary : 'transparent',
+        color: ['executive', 'creative'].includes(layout) ? '#fff' : t.primary,
+        borderBottom: `3px solid ${t.accent}`,
+        margin: '-42px -54px 22px',
+        padding: '34px 54px 24px',
+      }}>
+        <h1 style={{ color: 'inherit', fontSize: '2.4em', lineHeight: 1.1, margin: 0 }}>{personal.name || 'Resume'}</h1>
+        {personal.title && <div style={{ color: ['executive', 'creative'].includes(layout) ? t.accent : t.primary, fontSize: '1.15em', fontWeight: 600, marginTop: 6 }}>{personal.title}</div>}
+        {contacts.length > 0 && <div style={{ fontSize: '0.9em', marginTop: 9, overflowWrap: 'anywhere' }}>{contacts.join('  |  ')}</div>}
+      </header>
+      {visibleSections.map(renderSection)}
+    </div>
+  );
+}
+
+/** Layouts whose side panel must run full-bleed (they print edge-to-edge with no page margin). */
+export const PANEL_LAYOUTS = ['modern-sidebar', 'executive', 'elegant'];
+
+/** Layout key the preview will use for these props (single source of truth, also used by /print). */
+export function resolveLayoutKey({ templateSlug, layout, customization = {} } = {}) {
+  const selectedTemplate = templateSlug || customization.templateSlug || 'classic';
+  return TEMPLATE_LAYOUTS[selectedTemplate] || layout || customization.layout || selectedTemplate;
+}
+
 const stack = (name, serif) =>
   `'${name}', ${serif ? "Georgia, 'Times New Roman', serif" : "'Helvetica Neue', Arial, sans-serif"}`;
 
-export default function ResumePreview({ sections, customization = {}, templateSlug, layout }) {
-  const selectedTemplate = templateSlug || customization.templateSlug || 'classic';
-  const key = TEMPLATE_LAYOUTS[selectedTemplate] || layout || customization.layout || selectedTemplate;
+export default function ResumePreview({
+  sections, customization = {}, templateSlug, layout, previewRef, exportMode = false,
+}) {
+  const key = resolveLayoutKey({ templateSlug, layout, customization });
   const c = { ...getTemplateDefaults(key), ...customization };
   const Layout = LAYOUTS[key] || Classic;
 
@@ -594,22 +734,30 @@ export default function ResumePreview({ sections, customization = {}, templateSl
     accent: c.accentColor || '#2563eb',
     head: stack(c.font || c.headFont || 'Inter', c.serif),
   };
+  const normalizedSections = (sections || []).slice().sort(
+    (a, b) => Number(a.sort_order || 0) - Number(b.sort_order || 0)
+  );
 
   return (
     <div
       style={{
-        width: 794,
-        minHeight: 1123,
+        width: exportMode ? '210mm' : 794,
+        minHeight: 'var(--page-min, 1123px)',
         background: '#fff',
         color: '#222',
         boxSizing: 'border-box',
         fontFamily: stack(c.font || 'Inter', c.serif),
         fontSize: `${c.fontSize || 10}pt`,
         lineHeight: c.lineHeight || 1.5,
-        overflow: 'hidden',
+        overflow: exportMode ? 'visible' : 'hidden',
       }}
+      ref={previewRef}
     >
-      <Layout d={normalize(sections)} t={t} />
+      {customization.customSectionOrder ? (
+        <OrderedResume sections={normalizedSections} t={t} layout={key} />
+      ) : (
+        <Layout d={normalize(normalizedSections)} t={t} />
+      )}
     </div>
   );
 }

@@ -18,7 +18,7 @@ function skillsSimilarity(skills1, skills2) {
 async function generateWithGemini(prompt) {
   const { GoogleGenerativeAI } = require('@google/generative-ai');
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-3.6-flash' });
   const result = await model.generateContent(prompt);
   return result.response.text();
 }
@@ -220,7 +220,7 @@ const generateResume = async (req, res, next) => {
       `INSERT INTO ai_resume_cache (cache_key, job_role, skills_input, experience_level, generated_content, model_used)
        VALUES (?, ?, ?, ?, ?, ?)`,
       [cacheKey, jobRole, skills, experienceLevel, JSON.stringify(parsedContent),
-        process.env.AI_PROVIDER === 'openai' ? 'gpt-3.5-turbo' : 'gemini-2.5-flash']
+        process.env.AI_PROVIDER === 'openai' ? 'gpt-3.5-turbo' : 'gemini-3.6-flash']
     );
 
     const userId = req.user?.role !== 'guest' ? req.user?.id : null;
@@ -276,8 +276,19 @@ Return ONLY the improved content as JSON matching the same structure. No explana
 const calculateAtsScore = async (req, res, next) => {
   try {
     const { resumeContent, jobDescription } = req.body;
-
-    const prompt = `Analyze this resume and provide an ATS compatibility score.
+    if (!resumeContent || typeof resumeContent !== 'object' || Array.isArray(resumeContent)) {
+      return res.status(400).json({ success: false, message: 'Resume content is required for ATS analysis.' });
+    }
+    if (jobDescription !== undefined && typeof jobDescription !== 'string') {
+      return res.status(400).json({ success: false, message: 'Job description must be plain text.' });
+    }
+    if (JSON.stringify(resumeContent).length > 50000) {
+      return res.status(400).json({ success: false, message: 'Resume content is too large to analyze.' });
+    }
+    if (typeof jobDescription === 'string' && jobDescription.length > 5000) {
+      return res.status(400).json({ success: false, message: 'Job description must be under 5,000 characters.' });
+    }
+    const prompt = `Analyze this resume and provide an ATS compatibility score. Score only the content provided. Do not invent qualifications or suggest adding a keyword unless it genuinely reflects the candidate's experience.
 
 Resume Content: ${JSON.stringify(resumeContent)}
 ${jobDescription ? `Target Job Description: ${jobDescription}` : ''}
@@ -307,8 +318,24 @@ Return JSON with this structure:
       analysis = JSON.parse(cleaned);
     } catch {
       const match = cleaned.match(/\{[\s\S]*\}/);
-      analysis = match ? JSON.parse(match[0]) : { overallScore: 70, suggestions: [] };
+      if (!match) {
+        return res.status(502).json({ success: false, message: 'AI returned an invalid ATS analysis. Please try again.' });
+      }
+      analysis = JSON.parse(match[0]);
     }
+    if (!analysis || typeof analysis !== 'object' || !Number.isFinite(Number(analysis.overallScore))) {
+      return res.status(502).json({ success: false, message: 'AI returned an incomplete ATS analysis. Please try again.' });
+    }
+    analysis.overallScore = Math.max(0, Math.min(100, Math.round(Number(analysis.overallScore))));
+    if (analysis.breakdown && typeof analysis.breakdown === 'object') {
+      Object.keys(analysis.breakdown).forEach(key => {
+        const score = Number(analysis.breakdown[key]);
+        analysis.breakdown[key] = Number.isFinite(score) ? Math.max(0, Math.min(100, Math.round(score))) : 0;
+      });
+    }
+    analysis.suggestions = Array.isArray(analysis.suggestions) ? analysis.suggestions : [];
+    analysis.missingKeywords = Array.isArray(analysis.missingKeywords) ? analysis.missingKeywords : [];
+    analysis.strengths = Array.isArray(analysis.strengths) ? analysis.strengths : [];
 
     res.json({ success: true, data: { analysis } });
   } catch (error) {
@@ -345,4 +372,36 @@ Return only the summary text, nothing else.`;
   }
 };
 
-module.exports = { generateResume, improveSection, calculateAtsScore, generateSummary };
+const rewriteBullet = async (req, res, next) => {
+  try {
+    const { bullet, jobRole, jobDescription } = req.body;
+    if (typeof bullet !== 'string' || !bullet.trim() || bullet.length > 2000) {
+      return res.status(400).json({ success: false, message: 'Enter a bullet point under 2,000 characters.' });
+    }
+    if (jobDescription !== undefined && typeof jobDescription !== 'string') {
+      return res.status(400).json({ success: false, message: 'Job description must be plain text.' });
+    }
+    if (typeof jobDescription === 'string' && jobDescription.length > 5000) {
+      return res.status(400).json({ success: false, message: 'Job description must be under 5,000 characters.' });
+    }
+    if (jobRole !== undefined && (typeof jobRole !== 'string' || jobRole.length > 120)) {
+      return res.status(400).json({ success: false, message: 'Job role must be plain text under 120 characters.' });
+    }
+
+    const prompt = `Rewrite this resume bullet for ${jobRole || 'the candidate'}.
+${jobDescription ? `Use the job description only to prioritize relevant wording. Job description: ${jobDescription}` : ''}
+Original bullet: ${bullet.trim()}
+
+Return one concise bullet sentence, without a bullet character or quotation marks.
+Keep every claim, metric, tool, and responsibility grounded in the original bullet. Do not invent numbers, achievements, skills, or experience. If a stronger rewrite would require unsupported details, keep the meaning and improve only clarity and action verbs.`;
+    const suggestion = (await callAI(prompt)).trim().replace(/^["'•\-\s]+|["'\s]+$/g, '');
+    if (!suggestion) {
+      return res.status(503).json({ success: false, message: 'AI did not return a rewrite. Please try again.' });
+    }
+    res.json({ success: true, data: { suggestion } });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { generateResume, improveSection, calculateAtsScore, generateSummary, rewriteBullet };

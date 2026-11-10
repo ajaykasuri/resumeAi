@@ -61,7 +61,9 @@ export function SummaryEditor({ content, onChange, resumeContext }) {
 }
 
 /* ── Experience ──────────────────────────── */
-export function ExperienceEditor({ content, onChange }) {
+export function ExperienceEditor({ content, onChange, resumeContext }) {
+  const [rewritingBullet, setRewritingBullet] = useState(null);
+  const [bulletSuggestion, setBulletSuggestion] = useState(null);
   const items = content.items || [];
   const update = (idx, key, val) => {
     const next = items.map((it, i) => i === idx ? { ...it, [key]: val } : it);
@@ -70,8 +72,30 @@ export function ExperienceEditor({ content, onChange }) {
   const addItem = () => onChange({ ...content, items: [...items, { jobTitle: '', company: '', location: '', startDate: '', endDate: '', description: '', bullets: [''] }] });
   const removeItem = (idx) => onChange({ ...content, items: items.filter((_, i) => i !== idx) });
   const addBullet = (idx) => { const it = { ...items[idx], bullets: [...(items[idx].bullets || []), ''] }; const next = items.map((x, i) => i === idx ? it : x); onChange({ ...content, items: next }); };
-  const updateBullet = (idx, bi, val) => { const bullets = items[idx].bullets.map((b, j) => j === bi ? val : b); update(idx, 'bullets', bullets); };
+  const updateBullet = (idx, bi, val) => {
+    const bullets = (items[idx].bullets || ['']).map((b, j) => j === bi ? val : b);
+    update(idx, 'bullets', bullets);
+    if (bulletSuggestion?.idx === idx && bulletSuggestion?.bulletIndex === bi) setBulletSuggestion(null);
+  };
   const removeBullet = (idx, bi) => { const bullets = items[idx].bullets.filter((_, j) => j !== bi); update(idx, 'bullets', bullets); };
+  const rewriteBullet = async (idx, bi) => {
+    const bullet = items[idx].bullets?.[bi] || '';
+    if (!bullet.trim()) { toast.error('Write a bullet before requesting a rewrite.'); return; }
+    setRewritingBullet(`${idx}-${bi}`);
+    setBulletSuggestion(null);
+    try {
+      const { data } = await aiAPI.rewriteBullet({
+        bullet,
+        jobRole: resumeContext?.jobRole,
+        jobDescription: resumeContext?.jobDescription,
+      });
+      setBulletSuggestion({ idx, bulletIndex: bi, text: data.data.suggestion });
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Could not rewrite this bullet.');
+    } finally {
+      setRewritingBullet(null);
+    }
+  };
 
   return (
     <div className="se-items">
@@ -93,13 +117,38 @@ export function ExperienceEditor({ content, onChange }) {
           <div className="form-group se-full">
             <label className="form-label">Key Achievements / Responsibilities</label>
             {(item.bullets || ['']).map((b, bi) => (
-              <div key={bi} className="se-bullet-row">
-                <span className="se-bullet-dot">•</span>
-                <input className="form-input" placeholder="Increased performance by 40% by..." value={b} onChange={e => updateBullet(idx, bi, e.target.value)} />
-                {(item.bullets || []).length > 1 && (
-                  <button className="btn btn-ghost btn-icon se-rm-btn" onClick={() => removeBullet(idx, bi)}><Trash2 size={12} /></button>
+              <React.Fragment key={bi}>
+                <div className="se-bullet-row">
+                  <span className="se-bullet-dot">•</span>
+                  <input className="form-input" placeholder="Increased performance by 40% by..." value={b} onChange={e => updateBullet(idx, bi, e.target.value)} />
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-icon se-rewrite-btn"
+                    title="Suggest an AI rewrite"
+                    aria-label={`Suggest a rewrite for achievement ${bi + 1}`}
+                    onClick={() => rewriteBullet(idx, bi)}
+                    disabled={rewritingBullet !== null}
+                  >
+                    <Sparkles size={13} />
+                  </button>
+                  {(item.bullets || []).length > 1 && (
+                    <button className="btn btn-ghost btn-icon se-rm-btn" onClick={() => removeBullet(idx, bi)}><Trash2 size={12} /></button>
+                  )}
+                </div>
+                {rewritingBullet === `${idx}-${bi}` && <div className="se-rewrite-status">Creating a suggestion...</div>}
+                {bulletSuggestion?.idx === idx && bulletSuggestion?.bulletIndex === bi && (
+                  <div className="se-rewrite-suggestion">
+                    <p>{bulletSuggestion.text}</p>
+                    <div>
+                      <button type="button" className="btn btn-primary btn-sm" onClick={() => {
+                        updateBullet(idx, bi, bulletSuggestion.text);
+                        setBulletSuggestion(null);
+                      }}>Use suggestion</button>
+                      <button type="button" className="btn btn-ghost btn-sm" onClick={() => setBulletSuggestion(null)}>Dismiss</button>
+                    </div>
+                  </div>
                 )}
-              </div>
+              </React.Fragment>
             ))}
             <button className="btn btn-ghost btn-sm se-add-sub" onClick={() => addBullet(idx)}><Plus size={13} /> Add Bullet</button>
           </div>
@@ -378,7 +427,7 @@ export function SectionEditor({ section, onChange, resumeContext }) {
   switch (section.section_type) {
     case 'personal_info': return <PersonalInfoEditor content={c} onChange={up} />;
     case 'summary': case 'objective': return <SummaryEditor content={c} onChange={up} resumeContext={resumeContext} />;
-    case 'experience': return <ExperienceEditor content={c} onChange={up} />;
+    case 'experience': return <ExperienceEditor content={c} onChange={up} resumeContext={resumeContext} />;
     case 'education': return <EducationEditor content={c} onChange={up} />;
     case 'skills': return <SkillsEditor content={c} onChange={up} />;
     case 'projects': return <ProjectsEditor content={c} onChange={up} />;

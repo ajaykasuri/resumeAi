@@ -113,6 +113,19 @@ CREATE TABLE resume_sections (
 );
 
 -- =============================================
+-- RESUME VERSIONS TABLE
+-- =============================================
+CREATE TABLE resume_versions (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  resume_id INT UNSIGNED NOT NULL,
+  version_name VARCHAR(120) NOT NULL,
+  snapshot JSON NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (resume_id) REFERENCES resumes(id) ON DELETE CASCADE,
+  INDEX idx_resume_versions (resume_id, created_at)
+);
+
+-- =============================================
 -- AI RESUME CACHE TABLE
 -- =============================================
 CREATE TABLE ai_resume_cache (

@@ -31,7 +31,12 @@ export default function TemplateSelectionPanel({ sections, customization, onSele
 
   const template = templates[activeIndex];
   const previewCustomization = template
-    ? { ...customization, ...(template.config || {}), templateSlug: template.slug }
+    ? {
+      ...customization,
+      ...(template.config || {}),
+      templateSlug: template.slug,
+      customSectionOrder: false,
+    }
     : customization;
 
   const navigate = (direction) => {

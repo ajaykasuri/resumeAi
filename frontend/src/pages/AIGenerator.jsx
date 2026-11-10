@@ -32,7 +32,7 @@ export default function AIGenerator() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const resumeId = searchParams.get('resumeId');
-  const { sections, setSections, customization, applyAIContent, saveResume, setResumeId } = useResume();
+  const { customization, applyAIContent, saveResume, setResumeId } = useResume();
 
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({
@@ -44,6 +44,7 @@ export default function AIGenerator() {
   const [wasCached, setWasCached] = useState(false);
   const [generationTime, setGenerationTime] = useState(0);
   const [previewSections, setPreviewSections] = useState([]);
+  const [applying, setApplying] = useState(false);
 
   useEffect(() => {
     if (resumeId) setResumeId(resumeId);
@@ -99,25 +100,37 @@ export default function AIGenerator() {
   };
 
   const handleApplyAndEdit = async () => {
-    if (!generatedContent) return;
-    // Apply name if provided
-    if (form.name) {
-      const personalIdx = sections.findIndex(s => s.section_type === 'personal_info');
-      if (personalIdx !== -1) {
-        setSections(prev => prev.map(s => s.section_type === 'personal_info'
-          ? { ...s, content: { ...s.content, name: form.name, title: form.jobRole } }
-          : s
-        ));
+    if (!generatedContent || applying) return;
+    setApplying(true);
+    try {
+      const generatedSections = applyAIContent(generatedContent, {
+        name: form.name.trim(),
+        title: form.jobRole.trim(),
+      });
+
+      if (resumeId) {
+        const saved = await saveResume({ targetJobRole: form.jobRole }, generatedSections);
+        if (!saved) return;
+        navigate(`/builder/${resumeId}`);
+      } else {
+        const title = `${form.name.trim() || form.jobRole.trim()} Resume`;
+        const { data } = await resumeAPI.create({
+          title,
+          targetJobRole: form.jobRole,
+          customization,
+        });
+        const createdResumeId = data.data.resumeId;
+        await resumeAPI.updateSections(createdResumeId, generatedSections);
+        navigate(`/builder/${createdResumeId}`);
       }
+
+      toast.success('AI content applied to resume!');
+    } catch (error) {
+      console.error('Failed to apply AI-generated resume:', error);
+      toast.error(error.response?.data?.message || 'Failed to apply AI content. Please try again.');
+    } finally {
+      setApplying(false);
     }
-    applyAIContent(generatedContent);
-    if (resumeId) {
-      await saveResume();
-      navigate(`/builder/${resumeId}`);
-    } else {
-      navigate('/builder');
-    }
-    toast.success('AI content applied to resume!');
   };
 
   const handleRegenerate = () => {
@@ -283,8 +296,8 @@ export default function AIGenerator() {
                       </div>
                     )}
                     <div className="review-actions">
-                      <button className="btn btn-primary btn-full" onClick={handleApplyAndEdit}>
-                        <Edit size={15} /> Apply & Open Editor
+                      <button className="btn btn-primary btn-full" onClick={handleApplyAndEdit} disabled={applying}>
+                        <Edit size={15} /> {applying ? 'Applying...' : 'Apply & Open Editor'}
                       </button>
                       <button className="btn btn-secondary btn-full" onClick={handleRegenerate}>
                         <RefreshCw size={14} /> Regenerate

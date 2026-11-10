@@ -96,6 +96,80 @@ export function calculateATSScore(sections) {
   return Math.min(100, score);
 }
 
+export function calculateResumeCompleteness(sections = []) {
+  const content = (type) => sections.find(section => section.section_type === type)?.content || {};
+  const personal = content('personal_info');
+  const summary = content('summary');
+  const experience = content('experience');
+  const education = content('education');
+  const skills = content('skills');
+  const projects = content('projects');
+  const certifications = content('certifications');
+  const checks = [
+    { label: 'Name and professional title', complete: Boolean(personal.name && personal.title), weight: 10 },
+    { label: 'Email and at least one contact method', complete: Boolean(personal.email && (personal.phone || personal.linkedin || personal.website)), weight: 10 },
+    { label: 'Professional summary', complete: (summary.text || '').trim().length >= 50, weight: 15 },
+    {
+      label: 'Work history with achievements',
+      complete: (experience.items || []).some(item => (item.bullets || []).some(Boolean) || item.description),
+      weight: 25,
+    },
+    {
+      label: 'Skills',
+      complete: (skills.categories || []).some(category => (category.skills || []).some(Boolean)) ||
+        (skills.items || []).some(Boolean),
+      weight: 15,
+    },
+    { label: 'Education', complete: (education.items || []).some(item => item.degree || item.institution), weight: 10 },
+    {
+      label: 'Projects or certifications',
+      complete: (projects.items || []).some(item => item.name || item.description) ||
+        (certifications.items || []).some(item => item.name),
+      weight: 10,
+    },
+    { label: 'Professional link', complete: Boolean(personal.linkedin || personal.website || personal.github), weight: 5 },
+  ];
+  const score = checks.reduce((total, check) => total + (check.complete ? check.weight : 0), 0);
+  return { score, checks };
+}
+
+const JOB_DESCRIPTION_STOP_WORDS = new Set(
+  'a about above after again against all also am an and any are as at be because been before being below between both but by can cannot could did do does doing down during each few for from further had has have having he her here hers herself him himself his how i if in into is it its itself just me more most my myself no nor not of off on once only or other our ours ourselves out over own same she should so some such than that the their theirs them themselves then there these they this those through to too under until up upon us using very was we were what when where which while who whom why will with within without would you your yours yourself yourselves role work team ability required preferred experience candidate responsible responsibilities including strong excellent plus senior junior knowledge familiar'.split(' ')
+);
+
+export function calculateJobDescriptionMatch(sections = [], jobDescription = '') {
+  const normalizeTerm = term => {
+    term = term.replace(/^[.-]+|[.-]+$/g, '');
+    if (term.length > 5 && term.endsWith('ing')) return term.slice(0, -3);
+    if (term.length > 4 && term.endsWith('ed')) return term.slice(0, -2);
+    if (term.length > 4 && term.endsWith('s') && !term.endsWith('ss')) return term.slice(0, -1);
+    return term;
+  };
+  const terms = [...new Set(
+    (jobDescription.toLowerCase().match(/[a-z][a-z+#.-]{1,}/g) || [])
+      .map(normalizeTerm)
+      .filter(term => !JOB_DESCRIPTION_STOP_WORDS.has(term))
+  )].slice(0, 40);
+  const extractValues = value => {
+    if (typeof value === 'string' || typeof value === 'number') return String(value);
+    if (Array.isArray(value)) return value.map(extractValues).join(' ');
+    if (value && typeof value === 'object') return Object.values(value).map(extractValues).join(' ');
+    return '';
+  };
+  const resumeWords = new Set(
+    sections.map(section => extractValues(section.content || {}))
+      .join(' ').toLowerCase().match(/[a-z][a-z+#.-]{1,}/g)?.map(normalizeTerm) || []
+  );
+  const matched = terms.filter(term => resumeWords.has(term));
+  const missing = terms.filter(term => !resumeWords.has(term));
+  return {
+    score: terms.length ? Math.round((matched.length / terms.length) * 100) : 0,
+    matched,
+    missing,
+    keywordCount: terms.length,
+  };
+}
+
 /* ── Download helpers ────────────────────── */
 export function triggerBlobDownload(blob, filename) {
   const url = URL.createObjectURL(blob);

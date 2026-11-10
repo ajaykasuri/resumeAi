@@ -1,5 +1,6 @@
 import React from 'react';
 import { Palette, Type, Sliders } from 'lucide-react';
+import { FONT_FAMILIES } from '../../fonts';
 import './CustomizationPanel.css';
 
 const COLORS = [
@@ -13,7 +14,7 @@ const COLORS = [
   { label: 'Gold', primary: '#2c2c2c', accent: '#c9a84c' },
 ];
 
-const FONTS = ['DM Sans', 'Inter', 'Lato', 'Roboto', 'Open Sans', 'Playfair Display', 'Merriweather', 'Source Serif 4'];
+const FONTS = FONT_FAMILIES;
 
 export default function CustomizationPanel({ customization, onChange }) {
   const update = (key, val) => onChange({ ...customization, [key]: val });

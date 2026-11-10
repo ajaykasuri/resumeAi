@@ -13,6 +13,7 @@ const ResumeBuilder = lazy(() => import('./pages/ResumeBuilder'));
 const AIGenerator = lazy(() => import('./pages/AIGenerator'));
 const Templates = lazy(() => import('./pages/Templates'));
 const SharedResume = lazy(() => import('./pages/SharedResume'));
+const PrintResume = lazy(() => import('./pages/PrintResume'));
 
 function PageLoader() {
   return (
@@ -62,6 +63,11 @@ function AppRoutes() {
 }
 
 export default function App() {
+  // Server-side PDF render target: keep it isolated from auth/API providers so it can never
+  // trigger a login redirect or network call while Chromium is printing.
+  if (typeof window !== 'undefined' && window.location.pathname === '/print') {
+    return <Suspense fallback={null}><PrintResume /></Suspense>;
+  }
   return (
     <AuthProvider>
       <ResumeProvider>

@@ -22,6 +22,12 @@
 .se-rm-btn { color: var(--text-muted) !important; flex-shrink: 0; }
 .se-rm-btn:hover { color: var(--error) !important; background: rgba(255,77,109,0.08) !important; }
 .se-add-sub { color: var(--text-muted) !important; font-size: 0.8rem !important; margin-top: 6px; }
+.se-rewrite-btn { color: var(--brand-primary) !important; flex-shrink: 0; }
+.se-rewrite-btn:disabled { opacity: 0.45; }
+.se-rewrite-status { margin: 4px 0 8px 24px; color: var(--text-muted); font-size: 0.75rem; }
+.se-rewrite-suggestion { margin: 4px 0 10px 24px; padding: 10px; background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); }
+.se-rewrite-suggestion p { color: var(--text-primary); font-size: 0.82rem; line-height: 1.5; margin-bottom: 8px; }
+.se-rewrite-suggestion > div { display: flex; gap: 6px; }
 .se-add-item { width: 100%; border: 1px dashed var(--border-default) !important; justify-content: center; }
 .se-add-item:hover { border-color: var(--brand-primary) !important; color: var(--brand-primary) !important; }
 

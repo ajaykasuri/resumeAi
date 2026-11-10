@@ -1,5 +1,37 @@
 const { v4: uuidv4 } = require('uuid');
-const { query, queryOne, transaction } = require('../config/database');
+const { pool, query, queryOne, transaction } = require('../config/database');
+
+let versionsTableReady;
+async function ensureResumeVersionsTable() {
+  if (!versionsTableReady) {
+    versionsTableReady = pool.query(`
+      CREATE TABLE IF NOT EXISTS resume_versions (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        resume_id INT UNSIGNED NOT NULL,
+        version_name VARCHAR(120) NOT NULL,
+        snapshot JSON NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (resume_id) REFERENCES resumes(id) ON DELETE CASCADE,
+        INDEX idx_resume_versions (resume_id, created_at)
+      )
+    `).catch(error => {
+      versionsTableReady = null;
+      throw error;
+    });
+  }
+  await versionsTableReady;
+}
+
+async function getResumeForVersioning(uuid, user) {
+  const resume = await queryOne('SELECT * FROM resumes WHERE uuid = ?', [uuid]);
+  if (!resume) return { error: 'not-found' };
+  if (user?.role === 'guest') {
+    if (resume.guest_session_id !== user.sessionId) return { error: 'forbidden' };
+  } else if (resume.user_id !== user?.id) {
+    return { error: 'forbidden' };
+  }
+  return { resume };
+}
 
 // GET /api/resumes
 const getResumes = async (req, res, next) => {
@@ -277,6 +309,125 @@ const updateSections = async (req, res, next) => {
   }
 };
 
+// GET /api/resumes/:id/versions
+const getResumeVersions = async (req, res, next) => {
+  try {
+    await ensureResumeVersionsTable();
+    const result = await getResumeForVersioning(req.params.id, req.user);
+    if (result.error === 'not-found') {
+      return res.status(404).json({ success: false, message: 'Resume not found' });
+    }
+    if (result.error) return res.status(403).json({ success: false, message: 'Access denied' });
+
+    const versions = await query(
+      'SELECT id, version_name, created_at FROM resume_versions WHERE resume_id = ? ORDER BY created_at DESC LIMIT 50',
+      [result.resume.id]
+    );
+    res.json({ success: true, data: { versions } });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// POST /api/resumes/:id/versions
+const createResumeVersion = async (req, res, next) => {
+  try {
+    const versionName = typeof req.body.versionName === 'string' ? req.body.versionName.trim() : '';
+    if (!versionName || versionName.length > 120) {
+      return res.status(400).json({ success: false, message: 'Version name must be between 1 and 120 characters.' });
+    }
+
+    await ensureResumeVersionsTable();
+    const result = await getResumeForVersioning(req.params.id, req.user);
+    if (result.error === 'not-found') {
+      return res.status(404).json({ success: false, message: 'Resume not found' });
+    }
+    if (result.error) return res.status(403).json({ success: false, message: 'Access denied' });
+
+    const sections = await query(
+      'SELECT section_type, custom_title, content, sort_order, is_visible FROM resume_sections WHERE resume_id = ? ORDER BY sort_order ASC',
+      [result.resume.id]
+    );
+    const snapshot = {
+      title: result.resume.title,
+      template_id: result.resume.template_id,
+      target_job_role: result.resume.target_job_role,
+      customization: typeof result.resume.customization === 'string'
+        ? JSON.parse(result.resume.customization)
+        : result.resume.customization,
+      sections: sections.map(section => ({
+        ...section,
+        content: typeof section.content === 'string' ? JSON.parse(section.content) : section.content,
+      })),
+    };
+    const insert = await query(
+      'INSERT INTO resume_versions (resume_id, version_name, snapshot) VALUES (?, ?, ?)',
+      [result.resume.id, versionName, JSON.stringify(snapshot)]
+    );
+    res.status(201).json({
+      success: true,
+      data: { version: { id: insert.insertId, version_name: versionName } },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// POST /api/resumes/:id/versions/:versionId/restore
+const restoreResumeVersion = async (req, res, next) => {
+  try {
+    await ensureResumeVersionsTable();
+    const result = await getResumeForVersioning(req.params.id, req.user);
+    if (result.error === 'not-found') {
+      return res.status(404).json({ success: false, message: 'Resume not found' });
+    }
+    if (result.error) return res.status(403).json({ success: false, message: 'Access denied' });
+
+    const version = await queryOne(
+      'SELECT snapshot FROM resume_versions WHERE id = ? AND resume_id = ?',
+      [req.params.versionId, result.resume.id]
+    );
+    if (!version) return res.status(404).json({ success: false, message: 'Resume version not found' });
+    const snapshot = typeof version.snapshot === 'string' ? JSON.parse(version.snapshot) : version.snapshot;
+    if (!snapshot || !Array.isArray(snapshot.sections)) {
+      return res.status(500).json({ success: false, message: 'Stored resume version is invalid.' });
+    }
+
+    await transaction(async conn => {
+      await conn.execute('DELETE FROM resume_sections WHERE resume_id = ?', [result.resume.id]);
+      for (let index = 0; index < snapshot.sections.length; index += 1) {
+        const section = snapshot.sections[index];
+        await conn.execute(
+          `INSERT INTO resume_sections (resume_id, section_type, custom_title, content, sort_order, is_visible)
+           VALUES (?, ?, ?, ?, ?, ?)`,
+          [
+            result.resume.id,
+            section.section_type,
+            section.custom_title || null,
+            JSON.stringify(section.content || {}),
+            section.sort_order || index + 1,
+            section.is_visible !== false && section.is_visible !== 0,
+          ]
+        );
+      }
+      await conn.execute(
+        `UPDATE resumes SET title = ?, template_id = ?, target_job_role = ?, customization = ?, updated_at = NOW()
+         WHERE id = ?`,
+        [
+          snapshot.title || result.resume.title,
+          snapshot.template_id ?? null,
+          snapshot.target_job_role || null,
+          JSON.stringify(snapshot.customization || {}),
+          result.resume.id,
+        ]
+      );
+    });
+    res.json({ success: true, message: 'Resume version restored successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // GET /api/resumes/shared/:token
 const getSharedResume = async (req, res, next) => {
   try {
@@ -311,4 +462,5 @@ const getSharedResume = async (req, res, next) => {
 module.exports = {
   getResumes, getResume, createResume, updateResume, deleteResume,
   duplicateResume, updateSections, getSharedResume,
+  getResumeVersions, createResumeVersion, restoreResumeVersion,
 };
